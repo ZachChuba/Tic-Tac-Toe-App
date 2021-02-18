@@ -1,0 +1,45 @@
+import React from 'react';
+import { useState } from 'react';
+import './Board.css'
+
+export function BoardComponent(props) {
+    const [board, setBoard] = useState(['','','','','','','','','']);
+    const [turn, setTurn] = useState(true); // true is x, false is y
+    
+    function updateArray(arr, index, value) {
+        return arr.map((val, i) => {
+            if (i == index) {
+                return value;
+            }
+            return val;
+        });
+        
+    }
+    
+    function onClickBoard(index) {
+        setBoard(prevBoard => updateArray(prevBoard, index, turn ? 'x' : 'o'));
+        setTurn(prevTurn => !prevTurn);
+    }
+    
+    return (
+        <div class="board">
+          <Square index='0' onClickFunction={onClickBoard} content={board[0]}/>
+          <Square index='1' onClickFunction={onClickBoard} content={board[1]}/>
+          <Square index='2' onClickFunction={onClickBoard} content={board[2]}/>
+          <Square index='3' onClickFunction={onClickBoard} content={board[3]}/>
+          <Square index='4' onClickFunction={onClickBoard} content={board[4]}/>
+          <Square index='5' onClickFunction={onClickBoard} content={board[5]}/>
+          <Square index='6' onClickFunction={onClickBoard} content={board[6]}/>
+          <Square index='7' onClickFunction={onClickBoard} content={board[7]}/>
+          <Square index='8' onClickFunction={onClickBoard} content={board[8]}/>
+        </div>
+    );
+}
+
+export function Square(props) {
+    return (
+        <div class="box" onClick={() => props.onClickFunction(props.index)}>
+        {props.content}
+        </div>
+    );
+}
