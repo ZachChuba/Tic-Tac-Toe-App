@@ -1,6 +1,9 @@
 import React from 'react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import io from 'socket.io-client';
 import './Board.css'
+
+const socket = io();
 
 export function BoardComponent(props) {
     const [board, setBoard] = useState(['','','','','','','','','']);
@@ -19,7 +22,19 @@ export function BoardComponent(props) {
     function onClickBoard(index) {
         setBoard(prevBoard => updateArray(prevBoard, index, turn ? 'x' : 'o'));
         setTurn(prevTurn => !prevTurn);
+        socket.emit('board_click', {tile: index, move: turn ? 'x' : 'o', turn: turn});
     }
+    
+    useEffect(() => {
+        socket.on('board_click', (data) => {
+        console.log('Board_click event received!');
+        console.log(data);
+        // If the server sends a message (on behalf of another client), then we
+        // add it to the list of messages to render it on the UI.
+        setTurn(prevTurn => data.turn);
+        setBoard(prevBoard => updateArray(prevBoard, data.tile, data.move));
+        });
+    }, []);
     
     return (
         <div class="board">
