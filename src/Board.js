@@ -5,6 +5,32 @@ import './Board.css'
 
 const socket = io();
 
+export function Login() {
+    const [showLoginPrompt, setLoginPrompt] = useState(true);
+    
+    function loginPressed(text) {
+        // if user has entered a name join and display
+        setLoginPrompt(prevVal => false);
+        // add to player/spectator list etc
+    }
+    
+    return (
+        <div>
+            {showLoginPrompt ? <LoginComponents clickFunction={loginPressed}/> : null}
+        </div>
+    );
+}
+
+function LoginComponents(props) {
+    const inputRef = useRef(null);
+    return (
+        <div>
+            <input ref={inputRef} required type="text" placeholder="Enter Username"/>
+            <button onClick={() => props.clickFunction(inputRef.current.value)}>Join Room</button>
+        </div>
+    );
+}
+
 export function BoardComponent(props) {
     const [board, setBoard] = useState(['','','','','','','','','']);
     const [turn, setTurn] = useState(true); // true is x, false is y
@@ -27,12 +53,15 @@ export function BoardComponent(props) {
     
     useEffect(() => {
         socket.on('board_click', (data) => {
-        console.log('Board_click event received!');
-        console.log(data);
-        // If the server sends a message (on behalf of another client), then we
-        // add it to the list of messages to render it on the UI.
-        setTurn(prevTurn => data.turn);
-        setBoard(prevBoard => updateArray(prevBoard, data.tile, data.move));
+            console.log('Board_click event received!');
+            console.log(data);
+            // If the server sends a message (on behalf of another client), then we
+            // add it to the list of messages to render it on the UI.
+            setTurn(prevTurn => data.turn);
+            setBoard(prevBoard => updateArray(prevBoard, data.tile, data.move));
+        });
+        socket.on('connect', () => {
+            
         });
     }, []);
     

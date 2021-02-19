@@ -2,7 +2,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { ListItem } from './ListItem.js';
-import { BoardComponent} from './Board.js';
+import { BoardComponent, Login} from './Board.js';
 import { useState, useRef } from 'react';
 
 function App() {
@@ -16,14 +16,18 @@ function App() {
   
   return (
     <div className="App">
+      <Login />
       <BoardComponent />
-      <input ref={inputRef} type="text" />
-      <button onClick={onClickButton}> Add to list </button>
-      <ul>
-        {myList.map(item => <ListItem name={item} />)}
-      </ul>
     </div>
   );
 }
 
 export default App;
+
+/* Old code for reference, TODO delete
+<input ref={inputRef} type="text" />
+      <button onClick={onClickButton}> Add to list </button>
+      <ul>
+        {myList.map(item => <ListItem name={item} />)}
+      </ul>
+*/
