@@ -11,8 +11,10 @@ export function Login() {
     function loginPressed(text) {
         // if user has entered a name join and display
         setLoginPrompt(prevVal => false);
+        socket.emit('login', {id:socket.io.engine.id, name: text});
         // add to player/spectator list etc
     }
+    
     
     return (
         <div>
@@ -29,6 +31,35 @@ function LoginComponents(props) {
             <button onClick={() => props.clickFunction(inputRef.current.value)}>Join Room</button>
         </div>
     );
+}
+
+function UserListContainer() {
+    
+    useEffect(() => {
+        socket.on('login', (data) => {
+            // add to playerlist
+        });
+        return function cleanup() {
+            // remove from playerlist
+            socket.emit('logout', {id:socket.io.engine.id});
+        };
+    });
+    return (
+        <div>
+        <h1> Players </h1>
+        <PlayersList />
+        <h1> Spectators </h1>
+        <SpectatorList />
+        </div>
+    );
+}
+
+function PlayersList() {
+    
+}
+
+function SpectatorList() {
+    
 }
 
 export function BoardComponent(props) {

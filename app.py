@@ -1,5 +1,4 @@
 import os
-import json
 from flask import Flask, send_from_directory, json, session
 from flask_socketio import SocketIO
 from flask_cors import CORS
