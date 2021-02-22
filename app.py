@@ -19,15 +19,15 @@ socketio = SocketIO(
 def index(filename):
     return send_from_directory('./build', filename)
 
-# When a client connects from this Socket connection, this function is run
-@socketio.on('connect')
-def on_connect():
-    pass
+# When a client clicks the login button, this function is run
+@socketio.on('login')
+def on_connect(data):
+    socketio.emit('login', data, broadcast=True, include_self=False)
 
 # When a client disconnects from this Socket connection, this function is run
-@socketio.on('disconnect')
-def on_disconnect():
-    pass
+@socketio.on('logout')
+def on_disconnect(data):
+    socketio.emit('logout', data, broadcast=True, include_self=False)
 
 # When a client emits the event 'chat' to the server, this function is run
 # 'chat' is a custom event name that we just decided

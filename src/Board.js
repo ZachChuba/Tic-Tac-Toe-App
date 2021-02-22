@@ -34,10 +34,22 @@ function LoginComponents(props) {
 }
 
 function UserListContainer() {
+    const [players, setPlayers] = useState([]);
+    
+    function removeFromArray(arr, id) {
+        return arr.filter((val, index) => {
+            return val[0] != id;
+        });
+    }
     
     useEffect(() => {
         socket.on('login', (data) => {
             // add to playerlist
+            setPlayers(prevList => [...prevList, [data.id, data.name]]);
+        });
+        socket.on('logout', (data) => {
+            // remove from playerlist
+            setPlayers(prevList => removeFromArray(prevList, data.id));
         });
         return function cleanup() {
             // remove from playerlist
@@ -47,18 +59,18 @@ function UserListContainer() {
     return (
         <div>
         <h1> Players </h1>
-        <PlayersList />
+        <PlayersList activePlayers={players.slice(0,2)}/>
         <h1> Spectators </h1>
-        <SpectatorList />
+        <SpectatorList activeSpectators={players.slice(2)}/>
         </div>
     );
 }
 
-function PlayersList() {
+function PlayersList(props) {
     
 }
 
-function SpectatorList() {
+function SpectatorList(props) {
     
 }
 
