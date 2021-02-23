@@ -33,6 +33,12 @@ function LoginComponents(props) {
     );
 }
 
+function ListElement(props) {
+    return (
+        <li> {props.name} </li>
+    );
+}
+
 function UserListContainer() {
     const [players, setPlayers] = useState([]);
     
@@ -55,7 +61,7 @@ function UserListContainer() {
             // remove from playerlist
             socket.emit('logout', {id:socket.io.engine.id});
         };
-    });
+    }, []);
     return (
         <div>
         <h1> Players </h1>
@@ -67,10 +73,30 @@ function UserListContainer() {
 }
 
 function PlayersList(props) {
+    const [activePlayers, changeActive] = useState([]);
+    changeActive(prevActive => props.activePlayers);
     
+    // New game if active players changes
+    useEffect(() => {
+        // reset board
+    }, [activePlayers]);
+    
+    return (
+        <ul>
+           {activePlayers.map(item => <ListItem name={item}/>)} 
+        </ul>
+    );
 }
 
 function SpectatorList(props) {
+    const [activeSpectators, changeActive] = useState([]);
+    changeActive(prevActive => props.activeSpectators);
+    
+    return (
+        <ul>
+           {activeSpectators.map(item => <ListItem name={item}/>)} 
+        </ul>
+    );
     
 }
 
