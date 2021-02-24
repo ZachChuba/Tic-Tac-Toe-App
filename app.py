@@ -1,5 +1,6 @@
 import os
-from flask import Flask, send_from_directory, json, session
+import json
+from flask import Flask, send_from_directory, json, session, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 
@@ -14,6 +15,8 @@ socketio = SocketIO(
     manage_session=False
 )
 
+currentPlayerList = []
+
 @app.route('/', defaults={"filename": "index.html"})
 @app.route('/<path:filename>')
 def index(filename):
@@ -23,13 +26,19 @@ def index(filename):
 @socketio.on('login')
 def on_connect(data):
     print('Login')
-    socketio.emit('login', data, broadcast=True, include_self=True)
+    currentPlayerList.append({'uid': data['id'], 'name': data['name']})
+    # json_for_init_login = "user_list: {}".format(json.dumps(currentPlayerList))
+    
+    socketio.emit('login', data, broadcast=True, include_self=False)
+    socketio.emit('login', json.dumps(currentPlayerList), room=request.sid)
 
 # When a client disconnects from this Socket connection, this function is run
 @socketio.on('logout')
 def on_disconnect(data):
+    global currentPlayerList
     print('Logout')
     socketio.emit('logout', data, broadcast=True, include_self=False)
+    currentPlayerList = list(filter(lambda entry: True if entry['uid'] != data['id'] else False, currentPlayerList))
 
 # When a client emits the event 'chat' to the server, this function is run
 # 'chat' is a custom event name that we just decided

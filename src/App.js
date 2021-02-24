@@ -22,12 +22,23 @@ function App() {
   useEffect(() => {
         socket.on('login', (data) => {
             // add to playerlist
-            setUserList(prevList => [...prevList, [data.id, data.name]]);
+            // Event 1: The user is not logging in for the first time
+            if (data.hasOwnProperty('id')) {
+              setUserList(prevList => [...prevList, [data.id, data.name]]);
+            } else { // Event 2: The user logs in for the first time, needs list from server
+              const dataJson = JSON.parse(data);
+              setUserList(prevList => dataJson.map(entry => [entry.uid, entry.name]));
+            }
         });
         socket.on('logout', (data) => {
             // remove from playerlist
             setUserList(prevList => removeFromArray(prevList, data.id));
         });
+        // Handle logout for when the user closes tab/refreshes page
+        window.addEventListener("beforeunload", function(e) {
+          socket.emit('logout', {id:socket.io.engine.id});
+        });
+        // Handle logout for any other instance where the object is dismounted
         return function cleanup() {
             // remove from playerlist
             socket.emit('logout', {id:socket.io.engine.id});
@@ -37,7 +48,7 @@ function App() {
   return (
     <div className="App">
       {!loggedIn ? <Login statusFunction={setLoggedIn} socket={socket}/> : null}
-      {loggedIn ? <BoardComponent /> : null}
+      {loggedIn ? <BoardComponent socket={socket}/> : null}
       {loggedIn ? <UserListContainer userList={userList} /> : null}
     </div>
   );

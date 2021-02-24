@@ -3,11 +3,10 @@ import { useState, useRef, useEffect } from 'react';
 import io from 'socket.io-client';
 import './Board.css'
 
-const socket = io();
-
 export function BoardComponent(props) {
     const [board, setBoard] = useState(['','','','','','','','','']);
     const [turn, setTurn] = useState(true); // true is x, false is y
+    let socket = props.socket;
     
     function updateArray(arr, index, value) {
         return arr.map((val, i) => {
@@ -33,9 +32,6 @@ export function BoardComponent(props) {
             // add it to the list of messages to render it on the UI.
             setTurn(prevTurn => data.turn);
             setBoard(prevBoard => updateArray(prevBoard, data.tile, data.move));
-        });
-        socket.on('connect', () => {
-            
         });
     }, []);
     
