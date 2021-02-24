@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
 export function UserListContainer(props) {
-    console.log(props.userList);
     return (
         <div>
             <h1> Players </h1>

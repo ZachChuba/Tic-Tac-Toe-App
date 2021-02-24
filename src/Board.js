@@ -5,7 +5,6 @@ import './Board.css'
 
 export function BoardComponent(props) {
     const [board, setBoard] = useState(['','','','','','','','','']);
-    const [turn, setTurn] = useState(true); // true is x, false is y
     let socket = props.socket;
     
     function updateArray(arr, index, value) {
@@ -18,20 +17,49 @@ export function BoardComponent(props) {
         
     }
     
+    function inArray(arr, target) {
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i][0].localeCompare(target) == 0) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    function whoseTurn() {
+        let xCount = 0;
+        let oCount = 0;
+        for (let i = 0; i < board.length; i++) {
+            if (board[i] === 'x')
+                xCount++;
+            if (board[i] === 'o') {
+                oCount++;
+            }
+        }
+        // player 0 or player 1
+        return xCount <= oCount ? 0 : 1;
+    }
+    
     function onClickBoard(index) {
-        setBoard(prevBoard => updateArray(prevBoard, index, turn ? 'x' : 'o'));
-        setTurn(prevTurn => !prevTurn);
-        socket.emit('board_click', {tile: index, move: turn ? 'x' : 'o', turn: turn});
+        let playerNumber = inArray(props.users, socket.io.engine.id);
+        if (playerNumber >= 0) {
+            if (whoseTurn() == playerNumber) {
+                setBoard(prevBoard => updateArray(prevBoard, index, playerNumber == 0 ? 'x' : 'o'));
+                socket.emit('board_click', {tile: index, move: playerNumber == 0 ? 'x' : 'o'});
+            }
+        }
     }
     
     useEffect(() => {
         socket.on('board_click', (data) => {
-            console.log('Board_click event received!');
-            console.log(data);
             // If the server sends a message (on behalf of another client), then we
             // add it to the list of messages to render it on the UI.
-            setTurn(prevTurn => data.turn);
             setBoard(prevBoard => updateArray(prevBoard, data.tile, data.move));
+        });
+        socket.on('board_state', (data) => {
+            // When someone joins in the middle of the game, give them the current board
+           const jsonData = JSON.parse(data);
+           setBoard(prevBoard => jsonData.map(entry => entry));
         });
     }, []);
     

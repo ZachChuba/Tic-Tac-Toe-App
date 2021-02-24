@@ -15,10 +15,11 @@ function App() {
   const [userList, setUserList] = useState([]);
   
   function removeFromArray(arr, id) {
-        return arr.filter((val, index) => {
-            return val[0] != id;
-        });
-    }
+      return arr.filter((val, index) => {
+          return val[0] != id;
+      });
+  }
+  
   useEffect(() => {
         socket.on('login', (data) => {
             // add to playerlist
@@ -47,8 +48,8 @@ function App() {
   
   return (
     <div className="App">
-      {!loggedIn ? <Login statusFunction={setLoggedIn} socket={socket}/> : null}
-      {loggedIn ? <BoardComponent socket={socket}/> : null}
+      {!loggedIn ? <Login statusFunction={setLoggedIn} socket={socket} /> : null}
+      {loggedIn ? <BoardComponent socket={socket} users={userList.slice(0,2)} /> : null}
       {loggedIn ? <UserListContainer userList={userList} /> : null}
     </div>
   );

@@ -16,6 +16,7 @@ socketio = SocketIO(
 )
 
 currentPlayerList = []
+board = ['', '', '', '', '', '', '', '', '']
 
 @app.route('/', defaults={"filename": "index.html"})
 @app.route('/<path:filename>')
@@ -31,6 +32,7 @@ def on_connect(data):
     
     socketio.emit('login', data, broadcast=True, include_self=False)
     socketio.emit('login', json.dumps(currentPlayerList), room=request.sid)
+    socketio.emit('board_state', json.dumps(board), room=request.sid)
 
 # When a client disconnects from this Socket connection, this function is run
 @socketio.on('logout')
@@ -51,7 +53,7 @@ def on_chat(data): # data is whatever arg you pass in your emit call on client
 
 @socketio.on('board_click')
 def on_move(data):
-    print(data)
+    board[int(data['tile'])] = data['move']
     # Broadcast ttt play to all clients
     socketio.emit('board_click', data, broadcast=True, include_self=False)
 
