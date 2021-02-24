@@ -22,11 +22,13 @@ def index(filename):
 # When a client clicks the login button, this function is run
 @socketio.on('login')
 def on_connect(data):
-    socketio.emit('login', data, broadcast=True, include_self=False)
+    print('Login')
+    socketio.emit('login', data, broadcast=True, include_self=True)
 
 # When a client disconnects from this Socket connection, this function is run
 @socketio.on('logout')
 def on_disconnect(data):
+    print('Logout')
     socketio.emit('logout', data, broadcast=True, include_self=False)
 
 # When a client emits the event 'chat' to the server, this function is run
