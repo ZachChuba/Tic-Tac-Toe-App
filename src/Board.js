@@ -74,15 +74,7 @@ export function BoardComponent(props) {
     
     return (
         <div class="board">
-          <Square index='0' onClickFunction={onClickBoard} content={board[0]}/>
-          <Square index='1' onClickFunction={onClickBoard} content={board[1]}/>
-          <Square index='2' onClickFunction={onClickBoard} content={board[2]}/>
-          <Square index='3' onClickFunction={onClickBoard} content={board[3]}/>
-          <Square index='4' onClickFunction={onClickBoard} content={board[4]}/>
-          <Square index='5' onClickFunction={onClickBoard} content={board[5]}/>
-          <Square index='6' onClickFunction={onClickBoard} content={board[6]}/>
-          <Square index='7' onClickFunction={onClickBoard} content={board[7]}/>
-          <Square index='8' onClickFunction={onClickBoard} content={board[8]}/>
+            {board.map((value, index) => <Square index={index} onClickFunction={onClickBoard} content={value} />)}
         </div>
     );
 }

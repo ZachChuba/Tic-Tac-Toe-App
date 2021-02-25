@@ -21,9 +21,11 @@ function App() {
           return val[0] != id;
       });
   }
-  
+  function resetGameButton() {
+      socket.emit('restart');
+  }
   function resetGame() {
-      return;
+      setWin(prevState => null);
   }
   
   useEffect(() => {
@@ -45,8 +47,11 @@ function App() {
             if (data.player == 'draw') {
                 setWin(prevState => 'draw');
             } else {
-              setWin(prevState => data.player);
+                setWin(prevState => data.player);
             }
+        });
+        socket.on('restart', () => {
+            resetGame();
         });
         // Handle logout for when the user closes tab/refreshes page
         window.addEventListener("beforeunload", function(e) {
@@ -62,7 +67,7 @@ function App() {
   return (
     <div className="App">
       {!loggedIn ? <Login statusFunction={setLoggedIn} socket={socket} /> : null}
-      {win != null && loggedIn ? <ShowWhenGameEnds result={win} resetGame={resetGame} /> : null}
+      {win != null && loggedIn ? <ShowWhenGameEnds result={win} resetGame={resetGameButton} /> : null}
       {loggedIn ? <BoardComponent socket={socket} users={userList.slice(0,2)} /> : null}
       {loggedIn ? <UserListContainer userList={userList} /> : null}
     </div>

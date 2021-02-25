@@ -62,6 +62,13 @@ def game_over(data):
     print('Game over Event')
     socketio.emit('game_over', data, room=request.sid)
 
+@socketio.on('restart')
+def on_restart():
+    global board
+    board = ['', '', '', '', '', '', '', '', '']
+    socketio.emit('board_state', json.dumps(board), broadcast=True, include_self=True)
+    socketio.emit('restart', broadcast=True, include_self=True)
+
 # Note that we don't call app.run anymore. We call socketio.run with app arg
 socketio.run(
     app,
