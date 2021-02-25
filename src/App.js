@@ -41,11 +41,11 @@ function App() {
             // remove from playerlist
             setUserList(prevList => removeFromArray(prevList, data.id));
         });
-        socket.on('win', (data) => {
-            if (data.player == null) {
-                setWin('draw');
+        socket.on('game_over', (data) => {
+            if (data.player == 'draw') {
+                setWin(prevState => 'draw');
             } else {
-              setWin(data.player);
+              setWin(prevState => data.player);
             }
         });
         // Handle logout for when the user closes tab/refreshes page

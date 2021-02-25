@@ -42,19 +42,22 @@ export function BoardComponent(props) {
     
     function onClickBoard(index) {
         let playerNumber = inArray(props.users, socket.io.engine.id);
-        if (playerNumber >= 0) {
-            if (whoseTurn() == playerNumber) {
+        if (playerNumber >= 0) { // Stop spectators from moving
+            // stop illegal moves
+            if (whoseTurn() == playerNumber && isGameOver(board) === null && board[index] === '') {
                 setBoard(prevBoard => updateArray(prevBoard, index, playerNumber == 0 ? 'x' : 'o'));
                 socket.emit('board_click', {tile: index, move: playerNumber == 0 ? 'x' : 'o'});
-                const winner = calculateWinner(board);
-                if (winner[0] != null) {
-                    socket.emit('game_over', {player: winner[0], line: winner[1]});
-                } else if (board.filter(location => location != '' ? false : true).length == 0) {
-                    socket.emit('game_over', {player: null});
-                }
             }
         }
     }
+    
+    // Whenever the board updates, check if game is over
+    useEffect(() => {
+        const gameEnded = isGameOver(board);
+        if (gameEnded != null) {
+            socket.emit('game_over', {player: gameEnded});
+        }
+    }, board);
     
     useEffect(() => {
         socket.on('board_click', (data) => {
@@ -92,6 +95,17 @@ export function Square(props) {
     );
 }
 
+function isGameOver(board) {
+    const winner = calculateWinner(board);
+    if (winner != null) {
+        return winner;
+    } else if (board.filter(location => location != '' ? false : true).length == 0) {
+        return 'draw';
+    } else {
+        return null;
+    }
+}
+
 // From react TTT tutorial
 function calculateWinner(squares) {
   const lines = [
@@ -107,8 +121,8 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return [squares[a], squares];
+      return squares[a];
     }
   }
-  return [null];
+  return null;
 }

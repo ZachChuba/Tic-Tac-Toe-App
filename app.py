@@ -58,8 +58,9 @@ def on_move(data):
     socketio.emit('board_click', data, broadcast=True, include_self=False)
 
 @socketio.on('game_over')
-def on_win(data):
-    socketio.emit('game_over', data, broadcast=True, include_self=True)
+def game_over(data):
+    print('Game over Event')
+    socketio.emit('game_over', data, room=request.sid)
 
 # Note that we don't call app.run anymore. We call socketio.run with app arg
 socketio.run(
