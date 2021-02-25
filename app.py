@@ -57,6 +57,10 @@ def on_move(data):
     # Broadcast ttt play to all clients
     socketio.emit('board_click', data, broadcast=True, include_self=False)
 
+@socketio.on('game_over')
+def on_win(data):
+    socketio.emit('game_over', data, broadcast=True, include_self=True)
+
 # Note that we don't call app.run anymore. We call socketio.run with app arg
 socketio.run(
     app,

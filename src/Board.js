@@ -46,6 +46,12 @@ export function BoardComponent(props) {
             if (whoseTurn() == playerNumber) {
                 setBoard(prevBoard => updateArray(prevBoard, index, playerNumber == 0 ? 'x' : 'o'));
                 socket.emit('board_click', {tile: index, move: playerNumber == 0 ? 'x' : 'o'});
+                const winner = calculateWinner(board);
+                if (winner[0] != null) {
+                    socket.emit('game_over', {player: winner[0], line: winner[1]});
+                } else if (board.filter(location => location != '' ? false : true).length == 0) {
+                    socket.emit('game_over', {player: null});
+                }
             }
         }
     }
@@ -84,4 +90,25 @@ export function Square(props) {
         {props.content}
         </div>
     );
+}
+
+// From react TTT tutorial
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return [squares[a], squares];
+    }
+  }
+  return [null];
 }

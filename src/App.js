@@ -5,6 +5,7 @@ import { ListItem } from './ListItem.js';
 import { BoardComponent} from './Board.js';
 import { Login } from './UserLogin.js'
 import { UserListContainer } from './PlayerList.js';
+import { ShowWhenGameEnds } from './GameOverEvent.js';
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
@@ -13,11 +14,16 @@ const socket = io();
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userList, setUserList] = useState([]);
+  const [win, setWin] = useState(null);
   
   function removeFromArray(arr, id) {
       return arr.filter((val, index) => {
           return val[0] != id;
       });
+  }
+  
+  function resetGame() {
+      return;
   }
   
   useEffect(() => {
@@ -35,6 +41,13 @@ function App() {
             // remove from playerlist
             setUserList(prevList => removeFromArray(prevList, data.id));
         });
+        socket.on('win', (data) => {
+            if (data.player == null) {
+                setWin('draw');
+            } else {
+              setWin(data.player);
+            }
+        });
         // Handle logout for when the user closes tab/refreshes page
         window.addEventListener("beforeunload", function(e) {
           socket.emit('logout', {id:socket.io.engine.id});
@@ -49,6 +62,7 @@ function App() {
   return (
     <div className="App">
       {!loggedIn ? <Login statusFunction={setLoggedIn} socket={socket} /> : null}
+      {win != null ? <ShowWhenGameEnds result={win} resetGame={resetGame} /> : null}
       {loggedIn ? <BoardComponent socket={socket} users={userList.slice(0,2)} /> : null}
       {loggedIn ? <UserListContainer userList={userList} /> : null}
     </div>
