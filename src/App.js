@@ -62,7 +62,7 @@ function App() {
   return (
     <div className="App">
       {!loggedIn ? <Login statusFunction={setLoggedIn} socket={socket} /> : null}
-      {win != null ? <ShowWhenGameEnds result={win} resetGame={resetGame} /> : null}
+      {win != null && loggedIn ? <ShowWhenGameEnds result={win} resetGame={resetGame} /> : null}
       {loggedIn ? <BoardComponent socket={socket} users={userList.slice(0,2)} /> : null}
       {loggedIn ? <UserListContainer userList={userList} /> : null}
     </div>
