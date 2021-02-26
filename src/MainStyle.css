@@ -3,6 +3,7 @@ body {
 }
 
 .user_container {
+    margin: 50px;
     position: absolute;
     width: 20%;
     left: 40%;
@@ -61,4 +62,50 @@ input[type=text], select, textarea{
   border-radius: 4px;
   box-sizing: border-box;
   resize: vertical;
+}
+
+.list-item {
+  display: flex;
+  margin: 10px;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+.list-h4, .list-p {
+    margin: 0;
+}
+.list-h4 {
+    color: #555;
+    margin-left: 20px;
+    margin-top: 10px;
+    font-size: 18px;
+}
+.list-h1{
+    margin: 0;
+    margin-top: 10px;
+    color: #000;
+}
+.list-p{
+    margin-top: 5px;
+    color: #aaa;
+}
+
+.list-wrapper {
+  max-width: 350px;
+  margin: 50px auto;
+  background: white;
+}
+
+.list {
+  background: #fff;
+  border-radius: 2px;
+  list-style: none;
+  padding: 10px 20px;
+}
+
+.list-item-image {
+    border-radius: 50%;
+    width: 64px;
+    padding-left: 10px;
+    padding-right: 20px;
 }
