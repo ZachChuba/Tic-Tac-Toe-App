@@ -1,7 +1,6 @@
 
 import logo from './logo.svg';
 import './App.css';
-import { ListItem } from './ListItem.js';
 import { BoardComponent} from './Board.js';
 import { Login } from './UserLogin.js'
 import { UserListContainer } from './PlayerList.js';
@@ -75,11 +74,3 @@ function App() {
 }
 
 export default App;
-
-/* Old code for reference, TODO delete
-<input ref={inputRef} type="text" />
-      <button onClick={onClickButton}> Add to list </button>
-      <ul>
-        {myList.map(item => <ListItem name={item} />)}
-      </ul>
-*/
