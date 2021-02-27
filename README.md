@@ -23,4 +23,7 @@
 2. I couldn't figure out how to trigger a logout event. Using useEffect's cleanup, even if the user closed the tab the cleanup function which was supposed to have the logout wouldn't trigger. So, I did some googling until I found [this stack overflow post](https://stackoverflow.com/questions/65407028/how-to-detect-browser-tab-close-event-with-react-js), and implemented a window event listener for "beforeunload" which would successfully detect window closes and page refreshes.
 
 # Known Bugs
-1. Still in development, nothing works as intended
+1. Right now there's a bug where for some web browsers/connections, I can't detect when a particular user disconnects. Although window.eventListener("beforeunload") coupled with useEffect's cleanup function detects when most clients leave, sometimes it does not. If I had more time I would research the unloading detection mechanisms and find a more robust way of detecting who leaves.
+2. People are able to join with whatever name they please, which could be used to confuse the interfacing (or in the future the leaderboards). I would set certain character limits to join if I had more time.
+###3. CSS alignment. 
+I'm too new with CSS to make sure that everything doesn't crash into each other depending on how big the screen is. I've drawn the alignment such that it fits neetly on my 17" laptop screen, but am aware that some elements in the game move with resize, while others don't which causes collisions. If I had more time, I would work on ensuring the items are properly aligned on all screens. An image of how it *should* look is available [here](https://imgur.com/a/nDlt3W6).

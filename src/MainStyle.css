@@ -4,7 +4,7 @@ body {
 
 .user_container {
     margin: 50px;
-    position: absolute;
+    position: relative;
     width: 20%;
     left: 40%;
     border: solid;
@@ -54,6 +54,7 @@ body {
     margin: 0 0 24px 0;
     color: white;
   }
+  /* End Button */
 
 input[type=text], select, textarea{
   width: 100%;
@@ -64,6 +65,7 @@ input[type=text], select, textarea{
   resize: vertical;
 }
 
+/* List inspired by (and uses some of the format of) https://codepen.io/smellycode/pen/NjRYgO */
 .list-item {
   display: flex;
   margin: 10px;
@@ -108,4 +110,14 @@ input[type=text], select, textarea{
     width: 64px;
     padding-left: 10px;
     padding-right: 20px;
+}
+/* End List */
+
+.playAgain {
+    position: relative;
+    right: 28%;
+    top: 2%;
+}
+.winner-h1 {
+    color: white;
 }
