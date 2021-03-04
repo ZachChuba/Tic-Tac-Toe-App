@@ -79,7 +79,8 @@ def on_get_leaderboard():
 @socketio.on('game_over')
 def game_over(data):
     print('Game over Event: {}'.format(data['state']))
-    if data['state'] == 'win':
+    print(data)
+    if data['state'] == 'win' and not(data['winner'] is None) and not(data['loser'] is None):
         add_game_to_leaderboard(data['winner'], data['loser'])
     socketio.emit('game_over', data, broadcast=True, include_self=True)
 
@@ -102,13 +103,13 @@ def ensure_new_user_on_leaderboard(username):
 
 def add_game_to_leaderboard(winner, loser):
     # check if person already exists
-    winner = Player.query.filter_by(username=winner)
-    loser = Player.query.filter_by(username=winner)
-    if winner is None: # does not exist
+    winner_entry = Player.query.filter_by(username=winner).first()
+    loser_entry = Player.query.filter_by(username=loser).first()
+    if winner_entry is None: # does not exist
         add_player_to_leaderboard(winner, 101)
     else:
         update_leaderboard_score(winner, 1)
-    if loser is None:
+    if loser_entry is None:
         add_player_to_leaderboard(loser, 99)
     else:
         update_leaderboard_score(loser, -1)
@@ -120,6 +121,7 @@ def add_player_to_leaderboard(playername, score):
 
 def update_leaderboard_score(player_name, score_action):
     user_profile = Player.query.filter_by(username=player_name).first()
+    user_profile.username = user_profile.username
     user_profile.score = user_profile.score + score_action
     db.session.commit()
 

@@ -93,6 +93,8 @@ input[type=text], select, textarea{
 }
 
 .list-wrapper {
+  position: relative;
+  left: 100px;
   max-width: 350px;
   margin: 50px auto;
   background: white;

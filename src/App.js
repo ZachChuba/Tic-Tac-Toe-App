@@ -44,9 +44,9 @@ function App() {
         });
         socket.on('game_over', (data) => {
             if (data.state == 'draw') {
-                setWin(prevState => 'draw');
+                setWin('draw');
             } else {
-                setWin(prevState => data.winner);
+                setWin(data.winner);
             }
         });
         socket.on('restart', () => {

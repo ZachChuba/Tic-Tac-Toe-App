@@ -14,7 +14,7 @@ export function ShowWhenGameEnds(props) {
 function WinnerDisplay(props) {
     return (
         <div>
-            {props.result.length === 1 ? <h1 class="winner-h1"> Winner: {props.result} </h1> : <h1 class="winner-h1"> Draw </h1>}
+            {<h1 class="winner-h1"> Winner: {props.result} </h1>}
         </div>
     );
 }

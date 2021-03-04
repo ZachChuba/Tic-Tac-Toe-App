@@ -47,7 +47,7 @@ export function BoardComponent(props) {
             if (gameEnded == 'draw') {
                 socket.emit('game_over', {state: 'draw'});
             } else {
-                socket.emit('game_over', {state: 'win', winner: gameEnded, loser: props.users[0][1] == gameEnded ? props.users[0][1] : props.users[1][1]});
+                socket.emit('game_over', {state: 'win', winner: props.users[playerNumber][1], loser: playerNumber == 0 ? props.users[1][1] : props.users[0][1]});
             }
         }
         return newBoard;
