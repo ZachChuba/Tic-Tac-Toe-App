@@ -13,9 +13,21 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from models import Player # stop circular imports from models.py
+import models # stop circular imports from models.py
+Player = models.define_database_class(db)
 if __name__ == "__main__":
     db.create_all()
+"""
+def create_test_data():
+    player = Player(username="ra", score=101)
+    db.session.add(player)
+    db.session.commit()
+    print("Creating test data (allegedly)")
+    entries = Player.query.all()
+    for player in entries:
+        print(player)
+create_test_data()
+"""
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
