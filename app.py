@@ -1,107 +1,136 @@
+'''
+APP.py is the main server code for the web APPlication
+It handles the server's socket and database work
+'''
 import os
 import json
-from flask import Flask, send_from_directory, json, session, request
+from flask import Flask, send_from_directory, json, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__, static_folder='./build/static')
+APP = Flask(__name__, static_folder='./build/static')
 
 # Point SQLAlchemy to your Heroku database
-app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+APP.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://liurqpolnoltzn:a1df803d5e1df259bd9c3ac6112e7a04d60a1c918fc2cbd08917e854cadf6ba8@ec2-54-89-49-242.compute-1.amazonaws.com:5432/d2gm2h5mja5mbq'
 # Gets rid of a warning
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+DB = SQLAlchemy(APP)
 
 import models # stop circular imports from models.py
-Player = models.define_database_class(db)
+Player = models.define_database_class(DB)
 if __name__ == "__main__":
-    db.create_all()
-"""
-def create_test_data():
-    player = Player(username="ra", score=101)
-    db.session.add(player)
-    db.session.commit()
-    print("Creating test data (allegedly)")
-    entries = Player.query.all()
-    for player in entries:
-        print(player)
-create_test_data()
-"""
+    DB.create_all()
 
-cors = CORS(app, resources={r"/*": {"origins": "*"}})
+CORS = CORS(APP, resources={r"/*": {"origins": "*"}})
 
 socketio = SocketIO(
-    app,
+    APP,
     cors_allowed_origins="*",
     json=json,
     manage_session=False
 )
 
-currentPlayerList = []
-board = ['', '', '', '', '', '', '', '', '']
+CURRENT_PLAYER_LIST = []
+BOARD = ['', '', '', '', '', '', '', '', '']
 
-@app.route('/', defaults={"filename": "index.html"})
-@app.route('/<path:filename>')
+@APP.route('/', defaults={"filename": "index.html"})
+@APP.route('/<path:filename>')
 def index(filename):
+    '''
+    obligatory lint docstring, no clue what this does
+    '''
     return send_from_directory('./build', filename)
 
 # When a client clicks the login button, this function is run
 @socketio.on('login')
 def on_connect(data):
+    '''
+    After receiving login event, add the player to playerlist, 
+    send playerlist to everyone, add to leaderboard
+    '''
     print('Login')
-    currentPlayerList.append({'uid': data['id'], 'name': data['name']})
+    CURRENT_PLAYER_LIST.append({'uid': data['id'], 'name': data['name']})
     ensure_new_user_on_leaderboard(data['name'])
-    
+
     socketio.emit('login', data, broadcast=True, include_self=False)
-    socketio.emit('login', json.dumps(currentPlayerList), room=request.sid)
-    socketio.emit('board_state', json.dumps(board), room=request.sid)
+    socketio.emit('login', json.dumps(CURRENT_PLAYER_LIST), room=request.sid)
+    socketio.emit('board_state', json.dumps(BOARD), room=request.sid)
 
 # When a client disconnects from this Socket connection, this function is run
 @socketio.on('logout')
 def on_disconnect(data):
-    global currentPlayerList
+    '''
+    On the logout socketio event, remove the user that left from player list
+    transmit that new playerlist out
+    '''
+    global CURRENT_PLAYER_LIST
     print('Logout')
     socketio.emit('logout', data, broadcast=True, include_self=False)
-    currentPlayerList = list(filter(lambda entry: True if entry['uid'] != data['id'] else False, currentPlayerList))
+    CURRENT_PLAYER_LIST = list(
+        filter(lambda entry: entry['uid'] != data['id'], CURRENT_PLAYER_LIST))
 
 @socketio.on('board_click')
 def on_move(data):
-    board[int(data['tile'])] = data['move']
+    '''
+    On board_click event, update the board with the tile,
+    send the move out to clients
+    '''
+    BOARD[int(data['tile'])] = data['move']
     # Broadcast ttt play to all clients
     socketio.emit('board_click', data, broadcast=True, include_self=False)
 
 @socketio.on('get_leaderboard')
 def on_get_leaderboard():
+    '''
+    On get_leaderboard event, fetch the leaderboard and send to
+    requesting client
+    '''
     entries = get_leaderboard_data()
     socketio.emit('sending_leaderboard', json.dumps(entries), room=request.sid)
 
 @socketio.on('game_over')
 def game_over(data):
+    '''
+    On game_over event update the leaderboard (if necessary),
+    send out the game is over to all other clients
+    '''
     print('Game over Event: {}'.format(data['state']))
     print(data)
-    if data['state'] == 'win' and not(data['winner'] is None) and not(data['loser'] is None):
+    if data['state'] == 'win':
         add_game_to_leaderboard(data['winner'], data['loser'])
     socketio.emit('game_over', data, broadcast=True, include_self=True)
 
 
 @socketio.on('restart')
 def on_restart():
-    global board
-    board = ['', '', '', '', '', '', '', '', '']
-    socketio.emit('board_state', json.dumps(board), broadcast=True, include_self=True)
+    '''
+    On restart event, set the board to empty, and send the board to everyone,
+    emit restart to clients
+    '''
+    global BOARD
+    BOARD = ['', '', '', '', '', '', '', '', '']
+    socketio.emit('board_state', json.dumps(BOARD), broadcast=True, include_self=True)
     socketio.emit('restart', broadcast=True, include_self=True)
 
 
-'''
-DB Helper Functions -- Afraid to put in separate file b/c db relies on name==main
-'''
+
+#DB Helper Functions -- Afraid to put in separate file b/c db relies on name==main
 def ensure_new_user_on_leaderboard(username):
+    '''
+    Input: string username
+    Action: adds user to leaderboard if they aren't on it
+    '''
     user_if_exists = Player.query.filter_by(username=username).first()
     if user_if_exists is None:
         add_player_to_leaderboard(username, 100)
 
 def add_game_to_leaderboard(winner, loser):
+    '''
+    Input: String winner, loser
+    Action: Update leaderboard with +1 score for winner,
+    -1 score for loser
+    '''
     # check if person already exists
     winner_entry = Player.query.filter_by(username=winner).first()
     loser_entry = Player.query.filter_by(username=loser).first()
@@ -115,28 +144,37 @@ def add_game_to_leaderboard(winner, loser):
         update_leaderboard_score(loser, -1)
 
 def add_player_to_leaderboard(playername, score):
+    '''
+    Input: String playername, Int score
+    Action: Add playername and score to the leaderboard DB
+    '''
     new_player = Player(username=playername, score=score)
-    db.session.add(new_player)
-    db.session.commit()
+    DB.session.add(new_player)
+    DB.session.commit()
 
 def update_leaderboard_score(player_name, score_action):
+    '''
+    Input: String player_name, int score_action
+    Change leaderboard score for playername by scoreaction
+    '''
     user_profile = Player.query.filter_by(username=player_name).first()
     user_profile.username = user_profile.username
     user_profile.score = user_profile.score + score_action
-    db.session.commit()
+    DB.session.commit()
 
 def get_leaderboard_data():
+    '''
+    return a list of leaderboard entries in the format of a dictionary
+    {name: username, score: user_score}
+    '''
     top_50_users = Player.query.order_by(Player.score.desc()).limit(50).all()
     # format [{name: zach, score: 101}, {name: ra, score: 99}, ...]
     return list(map(lambda user: {'name' : user.username, 'score' : user.score}, top_50_users))
+# END DB functions
 
-'''
-End DB Helper Functions
-'''
-
-# Note that we don't call app.run anymore. We call socketio.run with app arg
+# Note that we don't call APP.run anymore. We call socketio.run with APP arg
 socketio.run(
-    app,
+    APP,
     host=os.getenv('IP', '0.0.0.0'),
     port=8081 if os.getenv('C9_PORT') else int(os.getenv('PORT', 8081)),
 )

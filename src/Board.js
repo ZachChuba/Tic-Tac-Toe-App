@@ -1,6 +1,6 @@
 import React from 'react';
-import { useState, useRef, useEffect } from 'react';
-import io from 'socket.io-client';
+import { useState, useEffect } from 'react';
+// import io from 'socket.io-client';
 import './Board.css'
 
 export function BoardComponent(props) {

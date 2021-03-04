@@ -1,10 +1,10 @@
 
-import logo from './logo.svg';
 import './App.css';
 import { BoardComponent} from './Board.js';
 import { Login } from './UserLogin.js'
 import { UserListContainer } from './PlayerList.js';
 import { ShowWhenGameEnds } from './GameOverEvent.js';
+import { LeaderBoard } from './LeaderBoard.js'
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 
@@ -14,6 +14,8 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userList, setUserList] = useState([]);
   const [win, setWin] = useState(null);
+  const [showLeaderBoard, setShowLeaderBoard] = useState(false);
+  const [leaderBoard, setLeaderBoard] = useState([])
   
   function removeFromArray(arr, id) {
       return arr.filter((val, index) => {
@@ -25,6 +27,14 @@ function App() {
   }
   function resetGame() {
       setWin(prevState => null);
+  }
+  function toggleLeaderBoard() {
+      if (showLeaderBoard === false) {
+          setShowLeaderBoard(true);
+          socket.emit('get_leaderboard');
+      } else {
+          setShowLeaderBoard(false);
+      }
   }
   
   useEffect(() => {
@@ -43,7 +53,7 @@ function App() {
             setUserList(prevList => removeFromArray(prevList, data.id));
         });
         socket.on('game_over', (data) => {
-            if (data.state == 'draw') {
+            if (data.state === 'draw') {
                 setWin('draw');
             } else {
                 setWin(data.winner);
@@ -51,6 +61,9 @@ function App() {
         });
         socket.on('restart', () => {
             resetGame();
+        });
+        socket.on('sending_leaderboard', (data) => {
+            setLeaderBoard(data);
         });
         // Handle logout for when the user closes tab/refreshes page
         window.addEventListener("beforeunload", function(e) {
@@ -66,9 +79,10 @@ function App() {
   return (
     <div className="App">
       {!loggedIn ? <Login statusFunction={setLoggedIn} socket={socket} /> : null}
-      {win != null && loggedIn ? <ShowWhenGameEnds result={win} resetGame={resetGameButton} /> : null}
-      {loggedIn ? <BoardComponent socket={socket} users={userList.slice(0,2)} /> : null}
-      {loggedIn ? <UserListContainer userList={userList} /> : null}
+      {win != null && loggedIn && !showLeaderBoard ? <ShowWhenGameEnds result={win} resetGame={resetGameButton} /> : null}
+      {loggedIn && !showLeaderBoard ? <BoardComponent socket={socket} users={userList.slice(0,2)} /> : null}
+      {loggedIn && !showLeaderBoard ? <UserListContainer userList={userList} /> : null}
+      {loggedIn && showLeaderBoard ? <LeaderBoard leaderBoard={leaderBoard} /> : null}
     </div>
   );
 }
