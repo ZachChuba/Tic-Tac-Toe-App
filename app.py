@@ -51,6 +51,7 @@ def index(filename):
 def on_connect(data):
     print('Login')
     currentPlayerList.append({'uid': data['id'], 'name': data['name']})
+    ensure_new_user_on_leaderboard(data['name'])
     
     socketio.emit('login', data, broadcast=True, include_self=False)
     socketio.emit('login', json.dumps(currentPlayerList), room=request.sid)
@@ -64,26 +65,40 @@ def on_disconnect(data):
     socketio.emit('logout', data, broadcast=True, include_self=False)
     currentPlayerList = list(filter(lambda entry: True if entry['uid'] != data['id'] else False, currentPlayerList))
 
-# When a client emits the event 'chat' to the server, this function is run
-# 'chat' is a custom event name that we just decided
-@socketio.on('chat')
-def on_chat(data): # data is whatever arg you pass in your emit call on client
-    print(str(data))
-    # This emits the 'chat' event from the server to all clients except for
-    # the client that emmitted the event that triggered this function
-    socketio.emit('chat',  data, broadcast=True, include_self=False)
-
 @socketio.on('board_click')
 def on_move(data):
-    print('click from {}'.format(request.sid))
     board[int(data['tile'])] = data['move']
     # Broadcast ttt play to all clients
     socketio.emit('board_click', data, broadcast=True, include_self=False)
 
+@socketio.on('get_leaderboard')
+def on_get_leaderboard():
+    entries = get_leaderboard_data()
+    socketio.emit('sending_leaderboard', json.dumps(entries), room=request.sid)
+
 @socketio.on('game_over')
 def game_over(data):
     print('Game over Event: {}'.format(data['state']))
+    if data['state'] == 'win':
+        add_game_to_leaderboard(data['winner'], data['loser'])
     socketio.emit('game_over', data, broadcast=True, include_self=True)
+
+
+@socketio.on('restart')
+def on_restart():
+    global board
+    board = ['', '', '', '', '', '', '', '', '']
+    socketio.emit('board_state', json.dumps(board), broadcast=True, include_self=True)
+    socketio.emit('restart', broadcast=True, include_self=True)
+
+
+'''
+DB Helper Functions -- Afraid to put in separate file b/c db relies on name==main
+'''
+def ensure_new_user_on_leaderboard(username):
+    user_if_exists = Player.query.filter_by(username=username).first()
+    if user_if_exists is None:
+        add_player_to_leaderboard(username, 100)
 
 def add_game_to_leaderboard(winner, loser):
     # check if person already exists
@@ -108,12 +123,14 @@ def update_leaderboard_score(player_name, score_action):
     user_profile.score = user_profile.score + score_action
     db.session.commit()
 
-@socketio.on('restart')
-def on_restart():
-    global board
-    board = ['', '', '', '', '', '', '', '', '']
-    socketio.emit('board_state', json.dumps(board), broadcast=True, include_self=True)
-    socketio.emit('restart', broadcast=True, include_self=True)
+def get_leaderboard_data():
+    top_50_users = Player.query.order_by(Player.score.desc()).limit(50).all()
+    # format [{name: zach, score: 101}, {name: ra, score: 99}, ...]
+    return list(map(lambda user: {'name' : user.username, 'score' : user.score}, top_50_users))
+
+'''
+End DB Helper Functions
+'''
 
 # Note that we don't call app.run anymore. We call socketio.run with app arg
 socketio.run(
