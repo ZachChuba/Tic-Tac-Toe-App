@@ -3,8 +3,19 @@ import json
 from flask import Flask, send_from_directory, json, session, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__, static_folder='./build/static')
+
+# Point SQLAlchemy to your Heroku database
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
+# Gets rid of a warning
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+from models import Player # stop circular imports from models.py
+if __name__ == "__main__":
+    db.create_all()
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
 
@@ -28,7 +39,6 @@ def index(filename):
 def on_connect(data):
     print('Login')
     currentPlayerList.append({'uid': data['id'], 'name': data['name']})
-    # json_for_init_login = "user_list: {}".format(json.dumps(currentPlayerList))
     
     socketio.emit('login', data, broadcast=True, include_self=False)
     socketio.emit('login', json.dumps(currentPlayerList), room=request.sid)
@@ -53,14 +63,38 @@ def on_chat(data): # data is whatever arg you pass in your emit call on client
 
 @socketio.on('board_click')
 def on_move(data):
+    print('click from {}'.format(request.sid))
     board[int(data['tile'])] = data['move']
     # Broadcast ttt play to all clients
     socketio.emit('board_click', data, broadcast=True, include_self=False)
 
 @socketio.on('game_over')
 def game_over(data):
-    print('Game over Event')
-    socketio.emit('game_over', data, room=request.sid)
+    print('Game over Event: {}'.format(data['state']))
+    socketio.emit('game_over', data, broadcast=True, include_self=True)
+
+def add_game_to_leaderboard(winner, loser):
+    # check if person already exists
+    winner = Player.query.filter_by(username=winner)
+    loser = Player.query.filter_by(username=winner)
+    if winner is None: # does not exist
+        add_player_to_leaderboard(winner, 101)
+    else:
+        update_leaderboard_score(winner, 1)
+    if loser is None:
+        add_player_to_leaderboard(loser, 99)
+    else:
+        update_leaderboard_score(loser, -1)
+
+def add_player_to_leaderboard(playername, score):
+    new_player = Player(username=playername, score=score)
+    db.session.add(new_player)
+    db.session.commit()
+
+def update_leaderboard_score(player_name, score_action):
+    user_profile = Player.query.filter_by(username=player_name).first()
+    user_profile.score = user_profile.score + score_action
+    db.session.commit()
 
 @socketio.on('restart')
 def on_restart():

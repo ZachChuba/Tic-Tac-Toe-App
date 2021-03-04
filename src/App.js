@@ -43,10 +43,10 @@ function App() {
             setUserList(prevList => removeFromArray(prevList, data.id));
         });
         socket.on('game_over', (data) => {
-            if (data.player == 'draw') {
+            if (data.state == 'draw') {
                 setWin(prevState => 'draw');
             } else {
-                setWin(prevState => data.player);
+                setWin(prevState => data.winner);
             }
         });
         socket.on('restart', () => {

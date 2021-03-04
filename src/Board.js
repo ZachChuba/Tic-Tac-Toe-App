@@ -40,24 +40,42 @@ export function BoardComponent(props) {
         return xCount <= oCount ? 0 : 1;
     }
     
+    function updateBoard(prevBoard, index, playerNumber) {
+        let newBoard = updateArray(prevBoard, index, playerNumber == 0 ? 'x' : 'o');
+        let gameEnded = isGameOver(newBoard);
+        if (gameEnded != null) {
+            if (gameEnded == 'draw') {
+                socket.emit('game_over', {state: 'draw'});
+            } else {
+                socket.emit('game_over', {state: 'win', winner: gameEnded, loser: props.users[0][1] == gameEnded ? props.users[0][1] : props.users[1][1]});
+            }
+        }
+        return newBoard;
+    }
+    
     function onClickBoard(index) {
         let playerNumber = inArray(props.users, socket.io.engine.id);
         if (playerNumber >= 0) { // Stop spectators from moving
             // stop illegal moves
             if (whoseTurn() == playerNumber && isGameOver(board) === null && board[index] === '') {
-                setBoard(prevBoard => updateArray(prevBoard, index, playerNumber == 0 ? 'x' : 'o'));
+                setBoard(prevBoard => updateBoard(prevBoard, index, playerNumber));
                 socket.emit('board_click', {tile: index, move: playerNumber == 0 ? 'x' : 'o'});
             }
         }
     }
     
     // Whenever the board updates, check if game is over
+    /*
     useEffect(() => {
         const gameEnded = isGameOver(board);
         if (gameEnded != null) {
-            socket.emit('game_over', {player: gameEnded});
+            if (gameEnded == 'draw') {
+                socket.emit('game_over', {state: 'draw'});
+            } else {
+                socket.emit('game_over', {state: 'win', winner: gameEnded, loser: props.users[0][1] == gameEnded ? props.users[0][1] : props.users[1][1]});
+            }
         }
-    }, board);
+    }, board);*/
     
     useEffect(() => {
         socket.on('board_click', (data) => {
