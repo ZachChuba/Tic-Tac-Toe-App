@@ -63,7 +63,7 @@ function App() {
             resetGame();
         });
         socket.on('sending_leaderboard', (data) => {
-            setLeaderBoard(data);
+            setLeaderBoard(JSON.parse(data));
         });
         // Handle logout for when the user closes tab/refreshes page
         window.addEventListener("beforeunload", function(e) {
@@ -79,10 +79,10 @@ function App() {
   return (
     <div className="App">
       {!loggedIn ? <Login statusFunction={setLoggedIn} socket={socket} /> : null}
-      {win != null && loggedIn && !showLeaderBoard ? <ShowWhenGameEnds result={win} resetGame={resetGameButton} /> : null}
-      {loggedIn && !showLeaderBoard ? <BoardComponent socket={socket} users={userList.slice(0,2)} /> : null}
-      {loggedIn && !showLeaderBoard ? <UserListContainer userList={userList} /> : null}
-      {loggedIn && showLeaderBoard ? <LeaderBoard leaderBoard={leaderBoard} /> : null}
+      {win != null && loggedIn ? <ShowWhenGameEnds result={win} resetGame={resetGameButton} /> : null}
+      {loggedIn ? <BoardComponent socket={socket} users={userList.slice(0,2)} /> : null}
+      {loggedIn ? <UserListContainer userList={userList} /> : null}
+      {loggedIn ? <LeaderBoard leaderBoard={leaderBoard} toggleLeaderboard={toggleLeaderBoard} showLeaderBoard={showLeaderBoard}/> : null}
     </div>
   );
 }
