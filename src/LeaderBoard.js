@@ -19,19 +19,22 @@ function LeaderBoardTable(props) {
             <thead><tr> <th>Player Name</th> <th>Score</th> </tr></thead>
             <tfoot>Only the top 50 are displayed</tfoot>
             <tbody>
-                {props.leaderBoard.map((playerEntry) => {
-                    <tr><td>{playerEntry.name}</td><td>{playerEntry.score}</td></tr>
-                })}
+                {props.leaderBoard.map(entry => <LeaderBoardRow name={entry[0]} score={entry[1]} />)}
             </tbody>
         </table>
         </div>
+    );
+}
+function LeaderBoardRow(props) {
+    return (
+        <tr><td>{props.name}</td><td>{props.score}</td></tr>
     );
 }
 
 function DisplayLeaderBoardButton(props) {
     return(
         <div>
-            <button class="myButton" onClick={props.toggleLeaderboard}>Toggle Leaderboard</button>
+            <button class="myButton" id="lb" onClick={props.toggleLeaderboard}>Toggle Leaderboard</button>
         </div>
     );
 }

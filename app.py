@@ -87,6 +87,7 @@ def on_get_leaderboard():
     requesting client
     '''
     entries = get_leaderboard_data()
+    print(entries)
     socketio.emit('sending_leaderboard', json.dumps(entries), room=request.sid)
 
 @socketio.on('game_over')

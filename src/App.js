@@ -63,7 +63,12 @@ function App() {
             resetGame();
         });
         socket.on('sending_leaderboard', (data) => {
-            setLeaderBoard(JSON.parse(data));
+            let dataJson = JSON.parse(data);
+            let jsFriendlyArray = []
+            for (let i = 0; i < dataJson.length; i++) {
+                jsFriendlyArray.push([dataJson[i].name, dataJson[i].score]);
+            }
+            setLeaderBoard(prevBoard => jsFriendlyArray);
         });
         // Handle logout for when the user closes tab/refreshes page
         window.addEventListener("beforeunload", function(e) {
