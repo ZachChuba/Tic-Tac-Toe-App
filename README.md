@@ -7,6 +7,8 @@ Clone/download the repository then do the following:
 
 ## Setup
 1. Run `echo "DANGEROUSLY_DISABLE_HOST_CHECK=true" > .env.development.local` in the project directory
+2. Create a postgres database and note the URL. You can do so via heroku following [this guide](https://www.heroku.com/postgres)
+3. Create a new file .env in the same directory as app.py; Add the following code: `DATABASE_URL='YOUR_POSTGRES_URL'`
 
 ## Run Application
 1. Run command in terminal `python app.py`
