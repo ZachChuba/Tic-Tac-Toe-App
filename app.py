@@ -4,6 +4,7 @@ It handles the server's socket and database work
 '''
 import os
 import json
+import time
 from flask import Flask, send_from_directory, json, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
@@ -87,9 +88,9 @@ def on_get_leaderboard():
     requesting client
     '''
     entries = get_leaderboard_data()
-    print(entries)
     socketio.emit('sending_leaderboard', json.dumps(entries), room=request.sid)
 
+last_updated_time = time.time()
 @socketio.on('game_over')
 def game_over(data):
     '''
@@ -97,8 +98,8 @@ def game_over(data):
     send out the game is over to all other clients
     '''
     print('Game over Event: {}'.format(data['state']))
-    print(data)
-    if data['state'] == 'win':
+    # Avoid duplicate db modifications
+    if data['state'] == 'win' and time.time() - last_updated_time > 2:
         add_game_to_leaderboard(data['winner'], data['loser'])
     socketio.emit('game_over', data, broadcast=True, include_self=True)
 
@@ -161,6 +162,7 @@ def update_leaderboard_score(player_name, score_action):
     user_profile = Player.query.filter_by(username=player_name).first()
     user_profile.username = user_profile.username
     user_profile.score = user_profile.score + score_action
+    DB.session.merge(user_profile)
     DB.session.commit()
 
 def get_leaderboard_data():
