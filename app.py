@@ -5,15 +5,17 @@ It handles the server's socket and database work
 import os
 import json
 import time
+from dotenv import load_dotenv, find_dotenv
 from flask import Flask, send_from_directory, json, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 
 APP = Flask(__name__, static_folder='./build/static')
+load_dotenv(find_dotenv())
 
 # Point SQLAlchemy to your Heroku database
-APP.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://liurqpolnoltzn:a1df803d5e1df259bd9c3ac6112e7a04d60a1c918fc2cbd08917e854cadf6ba8@ec2-54-89-49-242.compute-1.amazonaws.com:5432/d2gm2h5mja5mbq'
+APP.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 # Gets rid of a warning
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 DB = SQLAlchemy(APP)
