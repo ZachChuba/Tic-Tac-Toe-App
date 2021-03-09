@@ -20,22 +20,21 @@ APP.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 APP.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 DB = SQLAlchemy(APP)
 
-import models # stop circular imports from models.py
+import models  # stop circular imports from models.py
 Player = models.define_database_class(DB)
 if __name__ == "__main__":
     DB.create_all()
 
 CORS = CORS(APP, resources={r"/*": {"origins": "*"}})
 
-socketio = SocketIO(
-    APP,
-    cors_allowed_origins="*",
-    json=json,
-    manage_session=False
-)
+socketio = SocketIO(APP,
+                    cors_allowed_origins="*",
+                    json=json,
+                    manage_session=False)
 
 CURRENT_PLAYER_LIST = []
 BOARD = ['', '', '', '', '', '', '', '', '']
+
 
 @APP.route('/', defaults={"filename": "index.html"})
 @APP.route('/<path:filename>')
@@ -44,6 +43,7 @@ def index(filename):
     obligatory lint docstring, no clue what this does
     '''
     return send_from_directory('./build', filename)
+
 
 # When a client clicks the login button, this function is run
 @socketio.on('login')
@@ -60,6 +60,7 @@ def on_connect(data):
     socketio.emit('login', json.dumps(CURRENT_PLAYER_LIST), room=request.sid)
     socketio.emit('board_state', json.dumps(BOARD), room=request.sid)
 
+
 # When a client disconnects from this Socket connection, this function is run
 @socketio.on('logout')
 def on_disconnect(data):
@@ -73,6 +74,7 @@ def on_disconnect(data):
     CURRENT_PLAYER_LIST = list(
         filter(lambda entry: entry['uid'] != data['id'], CURRENT_PLAYER_LIST))
 
+
 @socketio.on('board_click')
 def on_move(data):
     '''
@@ -83,6 +85,7 @@ def on_move(data):
     # Broadcast ttt play to all clients
     socketio.emit('board_click', data, broadcast=True, include_self=False)
 
+
 @socketio.on('get_leaderboard')
 def on_get_leaderboard():
     '''
@@ -92,7 +95,10 @@ def on_get_leaderboard():
     entries = get_leaderboard_data()
     socketio.emit('sending_leaderboard', json.dumps(entries), room=request.sid)
 
+
 last_updated_time = time.time()
+
+
 @socketio.on('game_over')
 def game_over(data):
     '''
@@ -114,9 +120,11 @@ def on_restart():
     '''
     global BOARD
     BOARD = ['', '', '', '', '', '', '', '', '']
-    socketio.emit('board_state', json.dumps(BOARD), broadcast=True, include_self=True)
+    socketio.emit('board_state',
+                  json.dumps(BOARD),
+                  broadcast=True,
+                  include_self=True)
     socketio.emit('restart', broadcast=True, include_self=True)
-
 
 
 #DB Helper Functions -- Afraid to put in separate file b/c db relies on name==main
@@ -129,6 +137,7 @@ def ensure_new_user_on_leaderboard(username):
     if user_if_exists is None:
         add_player_to_leaderboard(username, 100)
 
+
 def add_game_to_leaderboard(winner, loser):
     '''
     Input: String winner, loser
@@ -138,7 +147,7 @@ def add_game_to_leaderboard(winner, loser):
     # check if person already exists
     winner_entry = Player.query.filter_by(username=winner).first()
     loser_entry = Player.query.filter_by(username=loser).first()
-    if winner_entry is None: # does not exist
+    if winner_entry is None:  # does not exist
         add_player_to_leaderboard(winner, 101)
     else:
         update_leaderboard_score(winner, 1)
@@ -146,6 +155,7 @@ def add_game_to_leaderboard(winner, loser):
         add_player_to_leaderboard(loser, 99)
     else:
         update_leaderboard_score(loser, -1)
+
 
 def add_player_to_leaderboard(playername, score):
     '''
@@ -155,6 +165,7 @@ def add_player_to_leaderboard(playername, score):
     new_player = Player(username=playername, score=score)
     DB.session.add(new_player)
     DB.session.commit()
+
 
 def update_leaderboard_score(player_name, score_action):
     '''
@@ -167,6 +178,7 @@ def update_leaderboard_score(player_name, score_action):
     DB.session.merge(user_profile)
     DB.session.commit()
 
+
 def get_leaderboard_data():
     '''
     return a list of leaderboard entries in the format of a dictionary
@@ -174,7 +186,13 @@ def get_leaderboard_data():
     '''
     top_50_users = Player.query.order_by(Player.score.desc()).limit(50).all()
     # format [{name: zach, score: 101}, {name: ra, score: 99}, ...]
-    return list(map(lambda user: {'name' : user.username, 'score' : user.score}, top_50_users))
+    return list(
+        map(lambda user: {
+            'name': user.username,
+            'score': user.score
+        }, top_50_users))
+
+
 # END DB functions
 
 # Note that we don't call APP.run anymore. We call socketio.run with APP arg
