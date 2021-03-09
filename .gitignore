@@ -20,6 +20,8 @@
 /__pycache__
 __pycache__
 .env
+.prettierignore
+.prettierrrc.json
 
 npm-debug.log*
 yarn-debug.log*
