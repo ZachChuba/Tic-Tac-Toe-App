@@ -1,12 +1,18 @@
 .board {
-	width: 300px; /* Total horizontal dimensions */
-	height: 300px; /* Total vertical dimensions */
-	position: relative;
-	left: 150px;
-	bottom: 50px;
-	display: grid; /* Enables CSS Grid */ 
-	grid-template-columns: repeat(3, 1fr); /* Total horizontal space broken into 3 columns */
-  grid-template-rows: repeat(3, 1fr); /* Total vertical space broken into 3 rows */
+  width: 300px; /* Total horizontal dimensions */
+  height: 300px; /* Total vertical dimensions */
+  position: relative;
+  left: 150px;
+  bottom: 50px;
+  display: grid; /* Enables CSS Grid */
+  grid-template-columns: repeat(
+    3,
+    1fr
+  ); /* Total horizontal space broken into 3 columns */
+  grid-template-rows: repeat(
+    3,
+    1fr
+  ); /* Total vertical space broken into 3 rows */
   padding: 0;
   text-align: center;
   background: #fff;

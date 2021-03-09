@@ -1,66 +1,67 @@
 body {
-	background: url(./img/prism.png) repeat 0 0;
+  background: url(./img/prism.png) repeat 0 0;
 }
 
 .user_container {
-    margin: 50px;
-    position: relative;
-    width: 20%;
-    left: 40%;
-    border: solid;
-    border-width: 2px;
-    
+  margin: 50px;
+  position: relative;
+  width: 20%;
+  left: 40%;
+  border: solid;
+  border-width: 2px;
 }
 
 /* Courtesy of CSS Button Generator */
 .myButton {
-	box-shadow:inset 0px 1px 0px 0px #cf866c;
-	background:linear-gradient(to bottom, #d0451b 5%, #bc3315 100%);
-	background-color:#d0451b;
-	border-radius:3px;
-	border:1px solid #942911;
-	display:inline-block;
-	cursor:pointer;
-	color:#ffffff;
-	font-family:Arial;
-	font-size:14px;
-	padding:13px 100px;
-	text-decoration:none;
-	text-shadow:0px 1px 0px #854629;
+  box-shadow: inset 0px 1px 0px 0px #cf866c;
+  background: linear-gradient(to bottom, #d0451b 5%, #bc3315 100%);
+  background-color: #d0451b;
+  border-radius: 3px;
+  border: 1px solid #942911;
+  display: inline-block;
+  cursor: pointer;
+  color: #ffffff;
+  font-family: Arial;
+  font-size: 14px;
+  padding: 13px 100px;
+  text-decoration: none;
+  text-shadow: 0px 1px 0px #854629;
 }
 .myButton:hover {
-	background:linear-gradient(to bottom, #bc3315 5%, #d0451b 100%);
-	background-color:#bc3315;
+  background: linear-gradient(to bottom, #bc3315 5%, #d0451b 100%);
+  background-color: #bc3315;
 }
 .myButton:active {
-	position:relative;
-	top:1px;
+  position: relative;
+  top: 1px;
 }
 #lb {
   position: fixed;
-  right:134vh;
-  top:60vh;
+  right: 134vh;
+  top: 60vh;
 }
 .login {
-	margin: 50px;
-    width: 300px;
-    overflow: hidden;  
-    margin-left: auto;  
-    margin-right: auto;
-    padding: 20px 20px;
-    background-color: #2F3032;
-    border: solid;
-    border-width: 1px;
-    border-radius: 10px;
+  margin: 50px;
+  width: 300px;
+  overflow: hidden;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 20px 20px;
+  background-color: #2f3032;
+  border: solid;
+  border-width: 1px;
+  border-radius: 10px;
 }
 
- .login-h1 {
-    margin: 0 0 24px 0;
-    color: white;
-  }
-  /* End Button */
+.login-h1 {
+  margin: 0 0 24px 0;
+  color: white;
+}
+/* End Button */
 
-input[type=text], select, textarea{
+input[type="text"],
+select,
+textarea {
   width: 100%;
   padding: 12px;
   border: 1px solid #ccc;
@@ -77,23 +78,24 @@ input[type=text], select, textarea{
   padding-top: 5px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
-.list-h4, .list-p {
-    margin: 0;
+.list-h4,
+.list-p {
+  margin: 0;
 }
 .list-h4 {
-    color: #555;
-    margin-left: 20px;
-    margin-top: 10px;
-    font-size: 18px;
+  color: #555;
+  margin-left: 20px;
+  margin-top: 10px;
+  font-size: 18px;
 }
-.list-h1{
-    margin: 0;
-    margin-top: 10px;
-    color: #000;
+.list-h1 {
+  margin: 0;
+  margin-top: 10px;
+  color: #000;
 }
-.list-p{
-    margin-top: 5px;
-    color: #aaa;
+.list-p {
+  margin-top: 5px;
+  color: #aaa;
 }
 
 .list-wrapper {
@@ -112,20 +114,20 @@ input[type=text], select, textarea{
 }
 
 .list-item-image {
-    border-radius: 50%;
-    width: 64px;
-    padding-left: 10px;
-    padding-right: 20px;
+  border-radius: 50%;
+  width: 64px;
+  padding-left: 10px;
+  padding-right: 20px;
 }
 /* End List */
 
 .playAgain {
-    position: relative;
-    right: 28%;
-    top: 2%;
+  position: relative;
+  right: 28%;
+  top: 2%;
 }
 .winner-h1 {
-    color: white;
+  color: white;
 }
 
 /*
@@ -136,34 +138,40 @@ table.blueTable {
   position: fixed;
   top: 20vh;
   right: 20vh;
-  border: 1px solid #1C6EA4;
-  background-color: #EEEEEE;
+  border: 1px solid #1c6ea4;
+  background-color: #eeeeee;
   max-width: 500px;
   text-align: left;
   border-collapse: collapse;
 }
-table.blueTable td, table.blueTable th {
-  border: 1px solid #AAAAAA;
+table.blueTable td,
+table.blueTable th {
+  border: 1px solid #aaaaaa;
   padding: 5px 3px;
 }
 table.blueTable tbody td {
   font-size: 13px;
 }
 table.blueTable tr:nth-child(even) {
-  background: #D0E4F5;
+  background: #d0e4f5;
 }
 table.blueTable thead {
-  background: #1C6EA4;
-  background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-  background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
-  background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+  background: #1c6ea4;
+  background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1c6ea4 100%);
+  background: -webkit-linear-gradient(
+    top,
+    #5592bb 0%,
+    #327cad 66%,
+    #1c6ea4 100%
+  );
+  background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1c6ea4 100%);
   border-bottom: 2px solid #444444;
 }
 table.blueTable thead th {
   font-size: 15px;
   font-weight: bold;
-  color: #FFFFFF;
-  border-left: 2px solid #D0E4F5;
+  color: #ffffff;
+  border-left: 2px solid #d0e4f5;
 }
 table.blueTable thead th:first-child {
   border-left: none;
@@ -172,11 +180,16 @@ table.blueTable thead th:first-child {
 table.blueTable tfoot {
   font-size: 14px;
   font-weight: bold;
-  color: #FFFFFF;
-  background: #D0E4F5;
-  background: -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
-  background: -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
-  background: linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+  color: #ffffff;
+  background: #d0e4f5;
+  background: -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #d0e4f5 100%);
+  background: -webkit-linear-gradient(
+    top,
+    #dcebf7 0%,
+    #d4e6f6 66%,
+    #d0e4f5 100%
+  );
+  background: linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #d0e4f5 100%);
   border-top: 2px solid #444444;
 }
 table.blueTable tfoot td {
