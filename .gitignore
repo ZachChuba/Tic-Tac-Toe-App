@@ -22,6 +22,8 @@ __pycache__
 .env
 .prettierignore
 .prettierrrc.json
+.eslintrc
+eslintrc.json
 
 npm-debug.log*
 yarn-debug.log*
