@@ -1,11 +1,11 @@
-import './App.css';
-import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
-import { BoardComponent } from './Board';
-import { Login } from './UserLogin';
-import { UserListContainer } from './PlayerList';
-import { ShowWhenGameEnds } from './GameOverEvent';
-import { LeaderBoard } from './LeaderBoard';
+import "./App.css";
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
+import { BoardComponent } from "./Board";
+import { Login } from "./UserLogin";
+import { UserListContainer } from "./PlayerList";
+import { ShowWhenGameEnds } from "./GameOverEvent";
+import { LeaderBoard } from "./LeaderBoard";
 
 const socket = io();
 
@@ -20,7 +20,7 @@ function App() {
     return arr.filter((val) => val[0] !== id);
   }
   function resetGameButton() {
-    socket.emit('restart');
+    socket.emit("restart");
   }
   function resetGame() {
     setWin(null);
@@ -28,17 +28,17 @@ function App() {
   function toggleLeaderBoard() {
     if (showLeaderBoard === false) {
       setShowLeaderBoard(true);
-      socket.emit('get_leaderboard');
+      socket.emit("get_leaderboard");
     } else {
       setShowLeaderBoard(false);
     }
   }
 
   useEffect(() => {
-    socket.on('login', (data) => {
+    socket.on("login", (data) => {
       // add to playerlist
       // Event 1: The user is not logging in for the first time
-      if (({}).hasOwnProperty.call(data, 'id')) {
+      if ({}.hasOwnProperty.call(data, "id")) {
         setUserList((prevList) => [...prevList, [data.id, data.name]]);
       } else {
         // Event 2: The user logs in for the first time, needs list from server
@@ -46,21 +46,21 @@ function App() {
         setUserList(() => dataJson.map((entry) => [entry.uid, entry.name]));
       }
     });
-    socket.on('logout', (data) => {
+    socket.on("logout", (data) => {
       // remove from playerlist
       setUserList((prevList) => removeFromArray(prevList, data.id));
     });
-    socket.on('game_over', (data) => {
-      if (data.state === 'draw') {
-        setWin('draw');
+    socket.on("game_over", (data) => {
+      if (data.state === "draw") {
+        setWin("draw");
       } else {
         setWin(data.winner);
       }
     });
-    socket.on('restart', () => {
+    socket.on("restart", () => {
       resetGame();
     });
-    socket.on('sending_leaderboard', (data) => {
+    socket.on("sending_leaderboard", (data) => {
       const dataJson = JSON.parse(data);
       const jsFriendlyArray = [];
       for (let i = 0; i < dataJson.length; i += 1) {
@@ -69,13 +69,13 @@ function App() {
       setLeaderBoard(() => jsFriendlyArray);
     });
     // Handle logout for when the user closes tab/refreshes page
-    window.addEventListener('beforeunload', () => {
-      socket.emit('logout', { id: socket.io.engine.id });
+    window.addEventListener("beforeunload", () => {
+      socket.emit("logout", { id: socket.io.engine.id });
     });
     // Handle logout for any other instance where the object is dismounted
     return function cleanup() {
       // remove from playerlist
-      socket.emit('logout', { id: socket.io.engine.id });
+      socket.emit("logout", { id: socket.io.engine.id });
     };
   }, []);
 
