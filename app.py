@@ -81,7 +81,7 @@ def on_move(data):
     On board_click event, update the board with the tile,
     send the move out to clients
     '''
-    BOARD[int(data['tile'])] = data['move']
+    update_board(data)
     # Broadcast ttt play to all clients
     socketio.emit('board_click', data, broadcast=True, include_self=False)
 
@@ -191,9 +191,13 @@ def get_leaderboard_data():
             'name': user.username,
             'score': user.score
         }, top_50_users))
-
-
 # END DB functions
+
+def update_board(data):
+    '''
+    Given json with a tile and move, add it to the board
+    '''
+    BOARD[int(data['tile'])] = data['move']
 
 # Note that we don't call APP.run anymore. We call socketio.run with APP arg
 socketio.run(
