@@ -6,9 +6,10 @@ import unittest.mock as mock
 from unittest.mock import patch
 import os
 import sys
+import json
 
 sys.path.append(os.path.abspath('../../'))
-from app import add_player_to_leaderboard, on_move, get_leaderboard_data
+from app import add_player_to_leaderboard, on_move, on_get_leaderboard
 
 def format_for_db(s):
     '''
@@ -50,9 +51,6 @@ class AddPlayerTest(unittest.TestCase):
                 format_for_db('John')
             ]
         }]
-
-        #PLAYER_CLASS = models.define_database_class(DB)
-        #initial_person = PLAYER_CLASS(username=self.INITIAL_USERNAME, score=self.SCORE)
 
         self.initial_db_mock = []
 
@@ -128,9 +126,15 @@ class OnMoveTest(unittest.TestCase):
         self.initial_board_mock[int(data['tile'])] = data['move']
     
     def mock_socket_emit(self, event_name, event_data=None, broadcast=False, include_self=False):
+        '''
+        Mock a socket emit event
+        '''
         self.emit_event = {'event': event_name, 'data': event_data, 'to_all': broadcast, 'include_self': include_self}
     
     def test_success(self):
+        '''
+        Test cases that end successfully
+        '''
         print('Test cases for on_move')
         for i in range(len(self.success_test_params)):
             test = self.success_test_params[i]
@@ -144,7 +148,56 @@ class OnMoveTest(unittest.TestCase):
                     
                     self.assertEqual(len(actual_board), len(expected_board))
                     self.assertIn(test[KEY_INPUT]['move'], actual_board) # Board contains the player moved
-                    self.assertDictContainsSubset(actual_event, expected_event) # Socket event emitted properly
+                    self.assertDictEqual(actual_event, expected_event) # Socket event emitted properly
+
+
+class OnGetLeaderboardTest(unittest.TestCase):
+    '''
+    Test cases for socket function on_get_leaderboard
+    '''
+    def setUp(self):
+        '''
+        Set up for the test cases
+        '''
+        self.success_test_params = [{
+            KEY_EXPECTED: {'socket': {'event': 'sending_leaderboard', 'data': json.dumps([{'name': 'Zach', 'score':'100'}]), 'to_all': False, 'include_self': False},
+                'leaderboard': [{'name': 'Zach', 'score':'100'}]
+            }
+        }]
+        self.emit_event = {}
+        self.leaderboard = []
+    
+    def mock_get_leaderboard_data(self):
+        '''
+        Mock getting the leaderboard dat from database
+        '''
+        self.leaderboard = [{'name': 'Zach', 'score':'100'}]
+        return self.leaderboard
+    
+    def mock_socket_emit(self, event_name, event_data=None, broadcast=False, include_self=False):
+        '''
+        Mock a socket emit event
+        '''
+        self.emit_event = {'event': event_name, 'data': event_data, 'to_all': broadcast, 'include_self': include_self}
+    
+    def test_success(self):
+        '''
+        Test cases that end successfully
+        '''
+        print('Test cases for on_get_leaderboard')
+        for i in range(len(self.success_test_params)):
+            test = self.success_test_params[i]
+            with patch('app.get_leaderboard_data', self.mock_get_leaderboard_data):
+                with patch('app.socketio.emit', self.mock_socket_emit):
+                    on_get_leaderboard()
+                    actual_event = self.emit_event
+                    actual_leaderboard = self.leaderboard
+                    expected_leaderboard = test[KEY_EXPECTED]['leaderboard']
+                    expected_event = test[KEY_EXPECTED]['socket']
+                    
+                    self.assertEqual(len(actual_leaderboard), len(expected_leaderboard))
+                    self.assertListEqual(test[KEY_INPUT]['leaerboard'], actual_leaderboard)
+                    self.assertDictEqual(actual_event, expected_event)
 
 if __name__ == '__main__':
     unittest.main()
