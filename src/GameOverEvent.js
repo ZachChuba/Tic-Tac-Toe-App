@@ -1,24 +1,33 @@
-import React from "react";
-import { useState } from "react";
-import io from "socket.io-client";
+import React from 'react';
 
 export function ShowWhenGameEnds(props) {
+  const { result, resetGame } = props;
   return (
-    <div class="playAgain">
-      <WinnerDisplay result={props.result} />
-      <PlayAgainButton resetGame={props.resetGame} />
+    <div className="playAgain">
+      <WinnerDisplay result={result} />
+      <PlayAgainButton resetGame={resetGame} />
     </div>
   );
 }
 
 function WinnerDisplay(props) {
-  return <div>{<h1 class="winner-h1"> Winner: {props.result} </h1>}</div>;
+  const { result } = props;
+  return (
+    <div>
+      <h1 className="winner-h1">
+        {' '}
+        Winner:
+        {result}
+      </h1>
+    </div>
+  );
 }
 
 function PlayAgainButton(props) {
+  const { resetGame } = props;
   return (
     <div>
-      <button class="myButton" onClick={props.resetGame}>
+      <button type="button" className="myButton" onClick={resetGame}>
         Play Again?
       </button>
     </div>

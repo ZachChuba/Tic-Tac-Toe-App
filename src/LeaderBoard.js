@@ -1,32 +1,35 @@
-import React from "react";
-import { useState, useEffect } from "react";
-import io from "socket.io-client";
-import "./MainStyle.css";
+import React from 'react';
+import './MainStyle.css';
 
 export function LeaderBoard(props) {
+  const { toggleLeaderboard, showLeaderBoard, leaderBoard } = props;
   return (
     <div>
-      <DisplayLeaderBoardButton toggleLeaderboard={props.toggleLeaderboard} />
-      {props.showLeaderBoard && (
-        <LeaderBoardTable leaderBoard={props.leaderBoard} />
+      <DisplayLeaderBoardButton toggleLeaderboard={toggleLeaderboard} />
+      {showLeaderBoard && (
+        <LeaderBoardTable leaderBoard={leaderBoard} />
       )}
     </div>
   );
 }
 
 function LeaderBoardTable(props) {
+  const { leaderBoard } = props;
   return (
     <div>
-      <table class="blueTable">
+      <table className="blueTable">
         <thead>
           <tr>
-            {" "}
-            <th>Player Name</th> <th>Score</th>{" "}
+            {' '}
+            <th>Player Name</th>
+            {' '}
+            <th>Score</th>
+            {' '}
           </tr>
         </thead>
         <tfoot>Only the top 50 are displayed</tfoot>
         <tbody>
-          {props.leaderBoard.map((entry) => (
+          {leaderBoard.map((entry) => (
             <LeaderBoardRow name={entry[0]} score={entry[1]} />
           ))}
         </tbody>
@@ -35,18 +38,20 @@ function LeaderBoardTable(props) {
   );
 }
 function LeaderBoardRow(props) {
+  const { name, score } = props;
   return (
     <tr>
-      <td>{props.name}</td>
-      <td>{props.score}</td>
+      <td>{name}</td>
+      <td>{score}</td>
     </tr>
   );
 }
 
 function DisplayLeaderBoardButton(props) {
+  const { toggleLeaderboard } = props;
   return (
     <div>
-      <button class="myButton" id="lb" onClick={props.toggleLeaderboard}>
+      <button type="button" className="myButton" id="lb" onClick={toggleLeaderboard}>
         Toggle Leaderboard
       </button>
     </div>

@@ -1,13 +1,13 @@
-import React from "react";
-import { useState, useRef } from "react";
-import io from "socket.io-client";
-import "./MainStyle.css";
+import React, { useRef } from 'react';
+
+import io from 'socket.io-client';
+import './MainStyle.css';
 
 export function Login(props) {
   function loginPressed(text) {
     // if user has entered a name join and display
-    props.statusFunction((prevValue) => true);
-    props.socket.emit("login", { id: props.socket.io.engine.id, name: text });
+    props.statusFunction(true);
+    props.socket.emit('login', { id: props.socket.io.engine.id, name: text });
   }
 
   return (
@@ -20,18 +20,20 @@ export function Login(props) {
 function LoginComponents(props) {
   const inputRef = useRef(null);
   return (
-    <div class="login">
-      <h1 class="login-h1">Login</h1>
+    <div className="login">
+      <h1 className="login-h1">Login</h1>
       <input
         ref={inputRef}
         required
         type="text"
         placeholder="Enter Username"
-      />{" "}
+      />
+      {' '}
       <br />
       <br />
       <button
-        class="myButton"
+        type="button"
+        className="myButton"
         onClick={() => props.clickFunction(inputRef.current.value)}
       >
         Join Room
