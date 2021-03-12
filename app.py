@@ -93,7 +93,7 @@ def on_get_leaderboard():
     requesting client
     '''
     entries = get_leaderboard_data()
-    socketio.emit('sending_leaderboard', json.dumps(entries), room=request.sid)
+    socketio.emit('sending_leaderboard', json.dumps(entries), room=get_request_sid())
 
 
 last_updated_time = time.time()
@@ -199,9 +199,16 @@ def update_board(data):
     '''
     BOARD[int(data['tile'])] = data['move']
 
+def get_request_sid():
+    '''
+    Returns the sid from a flask request object
+    '''
+    return request.sid
+
 # Note that we don't call APP.run anymore. We call socketio.run with APP arg
-socketio.run(
-    APP,
-    host=os.getenv('IP', '0.0.0.0'),
-    port=8081 if os.getenv('C9_PORT') else int(os.getenv('PORT', 8081)),
-)
+if __name__ == "__main__":
+    socketio.run(
+        APP,
+        host=os.getenv('IP', '0.0.0.0'),
+        port=8081 if os.getenv('C9_PORT') else int(os.getenv('PORT', 8081)),
+    )

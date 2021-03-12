@@ -160,7 +160,8 @@ class OnGetLeaderboardTest(unittest.TestCase):
         Set up for the test cases
         '''
         self.success_test_params = [{
-            KEY_EXPECTED: {'socket': {'event': 'sending_leaderboard', 'data': json.dumps([{'name': 'Zach', 'score':'100'}]), 'to_all': False, 'include_self': False},
+            KEY_EXPECTED: {'socket': {'event': 'sending_leaderboard', 'data': json.dumps([{'name': 'Zach', 'score':'100'}]), 'to_all': False, 'include_self': False, 'room': '00000000'
+            },
                 'leaderboard': [{'name': 'Zach', 'score':'100'}]
             }
         }]
@@ -174,11 +175,17 @@ class OnGetLeaderboardTest(unittest.TestCase):
         self.leaderboard = [{'name': 'Zach', 'score':'100'}]
         return self.leaderboard
     
-    def mock_socket_emit(self, event_name, event_data=None, broadcast=False, include_self=False):
+    def mock_request(self):
+        '''
+        Mocks flask request
+        '''
+        return '00000000'
+    
+    def mock_socket_emit(self, event_name, event_data=None, broadcast=False, include_self=False, room=None):
         '''
         Mock a socket emit event
         '''
-        self.emit_event = {'event': event_name, 'data': event_data, 'to_all': broadcast, 'include_self': include_self}
+        self.emit_event = {'event': event_name, 'data': event_data, 'to_all': broadcast, 'include_self': include_self, 'room': room}
     
     def test_success(self):
         '''
@@ -188,16 +195,17 @@ class OnGetLeaderboardTest(unittest.TestCase):
         for i in range(len(self.success_test_params)):
             test = self.success_test_params[i]
             with patch('app.get_leaderboard_data', self.mock_get_leaderboard_data):
-                with patch('app.socketio.emit', self.mock_socket_emit):
-                    on_get_leaderboard()
-                    actual_event = self.emit_event
-                    actual_leaderboard = self.leaderboard
-                    expected_leaderboard = test[KEY_EXPECTED]['leaderboard']
-                    expected_event = test[KEY_EXPECTED]['socket']
-                    
-                    self.assertEqual(len(actual_leaderboard), len(expected_leaderboard))
-                    self.assertListEqual(test[KEY_INPUT]['leaerboard'], actual_leaderboard)
-                    self.assertDictEqual(actual_event, expected_event)
+                with patch('app.get_request_sid', self.mock_request):
+                    with patch('app.socketio.emit', self.mock_socket_emit):
+                        on_get_leaderboard()
+                        actual_event = self.emit_event
+                        actual_leaderboard = self.leaderboard
+                        expected_leaderboard = test[KEY_EXPECTED]['leaderboard']
+                        expected_event = test[KEY_EXPECTED]['socket']
+                        
+                        self.assertEqual(len(actual_leaderboard), len(expected_leaderboard))
+                        self.assertListEqual(test[KEY_EXPECTED]['leaderboard'], actual_leaderboard)
+                        self.assertDictEqual(actual_event, expected_event)
 
 if __name__ == '__main__':
     unittest.main()
