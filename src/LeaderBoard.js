@@ -37,6 +37,7 @@ function LeaderBoardTable(props) {
     </div>
   );
 }
+
 function LeaderBoardRow(props) {
   const { name, score } = props;
   return (

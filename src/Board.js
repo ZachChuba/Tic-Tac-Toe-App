@@ -130,9 +130,9 @@ export function BoardComponent(props) {
 }
 
 export function Square(props) {
-  const { onClickFunction, content } = props;
+  const { index, onClickFunction, content } = props;
   return (
-    <div role="button" className="box" onClick={() => props.onClickFunction(props.index)} onKeyDown={() => props.onClickFunction(props.index)}>
+    <div role="button" className="box" onClick={() => onClickFunction(index)} onKeyDown={() => onClickFunction(index)}>
       {content}
     </div>
   );

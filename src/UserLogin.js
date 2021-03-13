@@ -1,13 +1,12 @@
 import React, { useRef } from 'react';
-
-import io from 'socket.io-client';
 import './MainStyle.css';
 
 export function Login(props) {
+  const { socket, statusFunction } = props;
   function loginPressed(text) {
     // if user has entered a name join and display
-    props.statusFunction(true);
-    props.socket.emit('login', { id: props.socket.io.engine.id, name: text });
+    statusFunction(true);
+    socket.emit('login', { id: socket.io.engine.id, name: text });
   }
 
   return (
