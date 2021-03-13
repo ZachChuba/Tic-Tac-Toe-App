@@ -198,6 +198,22 @@ def update_board(data):
     Given json with a tile and move, add it to the board
     '''
     BOARD[int(data['tile'])] = data['move']
+    return BOARD
+
+def add_player_list(change):
+    '''
+    Simulated add player to playerlist
+    '''
+    CURRENT_PLAYER_LIST.append((change['uid'], change['name']))
+    return CURRENT_PLAYER_LIST
+
+def remove_from_players(uid):
+    '''
+    Moot function for the sake of unit test
+    '''
+    player_list = [('0faaaaaa', 'zach'), ('0f111111', 'leet')]
+    new_list = list(filter(lambda entry: entry[0] != uid, player_list))
+    return new_list
 
 def get_request_sid():
     '''
