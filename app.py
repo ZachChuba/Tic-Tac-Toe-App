@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
 CORS = CORS(APP, resources={r"/*": {"origins": "*"}})
 
-socketio = SocketIO(APP,
+SOCKETIO = SocketIO(APP,
                     cors_allowed_origins="*",
                     json=json,
                     manage_session=False)
@@ -46,23 +46,23 @@ def index(filename):
 
 
 # When a client clicks the login button, this function is run
-@socketio.on('login')
+@SOCKETIO.on('login')
 def on_connect(data):
     '''
-    After receiving login event, add the player to playerlist, 
+    After receiving login event, add the player to playerlist,
     send playerlist to everyone, add to leaderboard
     '''
     print('Login')
     CURRENT_PLAYER_LIST.append({'uid': data['id'], 'name': data['name']})
     ensure_new_user_on_leaderboard(data['name'])
 
-    socketio.emit('login', data, broadcast=True, include_self=False)
-    socketio.emit('login', json.dumps(CURRENT_PLAYER_LIST), room=request.sid)
-    socketio.emit('board_state', json.dumps(BOARD), room=request.sid)
+    SOCKETIO.emit('login', data, broadcast=True, include_self=False)
+    SOCKETIO.emit('login', json.dumps(CURRENT_PLAYER_LIST), room=request.sid)
+    SOCKETIO.emit('board_state', json.dumps(BOARD), room=request.sid)
 
 
 # When a client disconnects from this Socket connection, this function is run
-@socketio.on('logout')
+@SOCKETIO.on('logout')
 def on_disconnect(data):
     '''
     On the logout socketio event, remove the user that left from player list
@@ -70,12 +70,12 @@ def on_disconnect(data):
     '''
     global CURRENT_PLAYER_LIST
     print('Logout')
-    socketio.emit('logout', data, broadcast=True, include_self=False)
+    SOCKETIO.emit('logout', data, broadcast=True, include_self=False)
     CURRENT_PLAYER_LIST = list(
         filter(lambda entry: entry['uid'] != data['id'], CURRENT_PLAYER_LIST))
 
 
-@socketio.on('board_click')
+@SOCKETIO.on('board_click')
 def on_move(data):
     '''
     On board_click event, update the board with the tile,
@@ -83,23 +83,25 @@ def on_move(data):
     '''
     update_board(data)
     # Broadcast ttt play to all clients
-    socketio.emit('board_click', data, broadcast=True, include_self=False)
+    SOCKETIO.emit('board_click', data, broadcast=True, include_self=False)
 
 
-@socketio.on('get_leaderboard')
+@SOCKETIO.on('get_leaderboard')
 def on_get_leaderboard():
     '''
     On get_leaderboard event, fetch the leaderboard and send to
     requesting client
     '''
     entries = get_leaderboard_data()
-    socketio.emit('sending_leaderboard', json.dumps(entries), room=get_request_sid())
+    SOCKETIO.emit('sending_leaderboard',
+                  json.dumps(entries),
+                  room=get_request_sid())
 
 
-last_updated_time = time.time()
+LAST_UPDATE_TIME = time.time()
 
 
-@socketio.on('game_over')
+@SOCKETIO.on('game_over')
 def game_over(data):
     '''
     On game_over event update the leaderboard (if necessary),
@@ -107,12 +109,12 @@ def game_over(data):
     '''
     print('Game over Event: {}'.format(data['state']))
     # Avoid duplicate db modifications
-    if data['state'] == 'win' and time.time() - last_updated_time > 2:
+    if data['state'] == 'win' and time.time() - LAST_UPDATE_TIME > 2:
         add_game_to_leaderboard(data['winner'], data['loser'])
-    socketio.emit('game_over', data, broadcast=True, include_self=True)
+    SOCKETIO.emit('game_over', data, broadcast=True, include_self=True)
 
 
-@socketio.on('restart')
+@SOCKETIO.on('restart')
 def on_restart():
     '''
     On restart event, set the board to empty, and send the board to everyone,
@@ -120,11 +122,11 @@ def on_restart():
     '''
     global BOARD
     BOARD = ['', '', '', '', '', '', '', '', '']
-    socketio.emit('board_state',
+    SOCKETIO.emit('board_state',
                   json.dumps(BOARD),
                   broadcast=True,
                   include_self=True)
-    socketio.emit('restart', broadcast=True, include_self=True)
+    SOCKETIO.emit('restart', broadcast=True, include_self=True)
 
 
 #DB Helper Functions -- Afraid to put in separate file b/c db relies on name==main
@@ -191,7 +193,10 @@ def get_leaderboard_data():
             'name': user.username,
             'score': user.score
         }, top_50_users))
+
+
 # END DB functions
+
 
 def update_board(data):
     '''
@@ -200,12 +205,14 @@ def update_board(data):
     BOARD[int(data['tile'])] = data['move']
     return BOARD
 
+
 def add_player_list(change):
     '''
     Simulated add player to playerlist
     '''
     CURRENT_PLAYER_LIST.append((change['uid'], change['name']))
     return CURRENT_PLAYER_LIST
+
 
 def remove_from_players(uid):
     '''
@@ -215,15 +222,17 @@ def remove_from_players(uid):
     new_list = list(filter(lambda entry: entry[0] != uid, player_list))
     return new_list
 
+
 def get_request_sid():
     '''
     Returns the sid from a flask request object
     '''
     return request.sid
 
+
 # Note that we don't call APP.run anymore. We call socketio.run with APP arg
 if __name__ == "__main__":
-    socketio.run(
+    SOCKETIO.run(
         APP,
         host=os.getenv('IP', '0.0.0.0'),
         port=8081 if os.getenv('C9_PORT') else int(os.getenv('PORT', 8081)),

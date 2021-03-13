@@ -193,7 +193,7 @@ class OnMoveTest(unittest.TestCase):
         for i in range(len(self.success_test_params)):
             test = self.success_test_params[i]
             with patch('app.update_board', self.mock_update_board):
-                with patch('app.socketio.emit', self.mock_socket_emit):
+                with patch('app.SOCKETIO.emit', self.mock_socket_emit):
                     on_move(test[KEY_INPUT])
                     actual_board = self.initial_board_mock
                     actual_event = self.emit_event
@@ -279,7 +279,7 @@ class OnGetLeaderboardTest(unittest.TestCase):
             with patch('app.get_leaderboard_data',
                        self.mock_get_leaderboard_data):
                 with patch('app.get_request_sid', self.mock_request):
-                    with patch('app.socketio.emit', self.mock_socket_emit):
+                    with patch('app.SOCKETIO.emit', self.mock_socket_emit):
                         on_get_leaderboard()
                         actual_event = self.emit_event
                         actual_leaderboard = self.leaderboard
@@ -292,7 +292,6 @@ class OnGetLeaderboardTest(unittest.TestCase):
                         self.assertListEqual(test[KEY_EXPECTED]['leaderboard'],
                                              actual_leaderboard)
                         self.assertDictEqual(actual_event, expected_event)
-
 
 if __name__ == '__main__':
     unittest.main()
