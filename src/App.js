@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import { BoardComponent } from './Board';
 import { Login } from './UserLogin';
 import { UserListContainer } from './PlayerList';
-import { ShowWhenGameEnds } from './GameOverEvent';
+import { ShowWhenGameEnds, GameEndedMessage } from './GameOverEvent';
 import { LeaderBoard } from './LeaderBoard';
 import { NavBar } from './NavBar';
 
@@ -35,6 +35,16 @@ function App() {
     } else {
       setShowLeaderBoard(false);
     }
+  }
+  function clickedGame() {
+      if (showLeaderBoard) {
+        setShowLeaderBoard(false);
+      }
+  }
+  function clickedLeader() {
+      if (!showLeaderBoard) {
+          setShowLeaderBoard(true);
+      }
   }
 
   useEffect(() => {
@@ -85,11 +95,21 @@ function App() {
   
     return (
       <Container>
+        { true &&
         <Row>
             <Col sm={12}>
-                <NavBar toggleGame={() => console.log('wow')} toggleLeaderboard={() => console.log('oh my')}/>
+                <NavBar toggleGame={clickedGame} toggleLeaderboard={clickedLeader}/>
             </Col>
         </Row>
+        }
+        { win !== null && loggedIn &&
+        <Row>
+            <Col className='ml-5' md={4}>
+                <GameEndedMessage result={'x'} resetGame={resetGameButton} />
+            </Col>
+        </Row>
+        }
+        { true &&
         <Row>
             <Col>
                 <BoardComponent socket={socket} users={userList.slice(0,2)} />
@@ -98,14 +118,16 @@ function App() {
                 <UserListContainer userList={userList} />
             </Col>
         </Row>
-        <Row>
-            <Col md={6}>
-                <ShowWhenGameEnds result={win} resetGame={resetGameButton}/>
-            </Col>
-        </Row>
+        }
       </Container>
     );
-  
+  /*
+  <Row>
+            <Col md={6}>
+                <ShowWhenGameEnds result={'x'} resetGame={resetGameButton}/>
+            </Col>
+        </Row>
+  */
 /*
   return (
     <div className="App">
