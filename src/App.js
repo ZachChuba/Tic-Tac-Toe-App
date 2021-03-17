@@ -91,15 +91,16 @@ function App() {
             </Col>
         </Row>
         <Row>
-            <Col md={6}>
-            </Col>
-        </Row>
-        <Row>
             <Col>
                 <BoardComponent socket={socket} users={userList.slice(0,2)} />
             </Col>
             <Col>
                 <UserListContainer userList={userList} />
+            </Col>
+        </Row>
+        <Row>
+            <Col md={6}>
+                <ShowWhenGameEnds result={win} resetGame={resetGameButton}/>
             </Col>
         </Row>
       </Container>
