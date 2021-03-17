@@ -90,3 +90,5 @@ function SpectatorListItem(props) {
     </ListGroup.Item>
   );
 }
+
+export default UserListContainer;

@@ -30,3 +30,5 @@ function Search(props) {
        </Form>
     );
 }
+
+export default NavBar;

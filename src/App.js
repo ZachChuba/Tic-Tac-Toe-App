@@ -94,32 +94,42 @@ function App() {
   }, []);
   
     return (
-      <Container>
-        { true &&
-        <Row>
-            <Col sm={12}>
-                <NavBar toggleGame={clickedGame} toggleLeaderboard={clickedLeader}/>
-            </Col>
-        </Row>
-        }
-        { win !== null && loggedIn &&
-        <Row>
-            <Col className='ml-5' md={4}>
-                <GameEndedMessage result={'x'} resetGame={resetGameButton} />
-            </Col>
-        </Row>
-        }
-        { true &&
-        <Row>
-            <Col>
-                <BoardComponent socket={socket} users={userList.slice(0,2)} />
-            </Col>
-            <Col>
-                <UserListContainer userList={userList} />
-            </Col>
-        </Row>
-        }
-      </Container>
+        <div>
+          { true && <div>
+            <Login socket={socket} statusFunction={setLoggedIn} />
+          </div>
+          }
+          { false && <div>
+            <NavBar toggleGame={clickedGame} toggleLeaderboard={clickedLeader}/>
+            <Container>
+              { true &&
+              <Row>
+                  <Col sm={12}>
+                      
+                  </Col>
+              </Row>
+              }
+              { win !== null && loggedIn &&
+              <Row>
+                  <Col className='ml-5' md={4}>
+                      <GameEndedMessage result={'x'} resetGame={resetGameButton} />
+                  </Col>
+              </Row>
+              }
+              { true &&
+              <Row>
+                  <Col>
+                      <BoardComponent socket={socket} users={userList.slice(0,2)} />
+                  </Col>
+                  <Col>
+                      <UserListContainer userList={userList} />
+                  </Col>
+              </Row>
+              }
+            </Container>
+          </div>
+          }
+      </div>
     );
   /*
   <Row>
