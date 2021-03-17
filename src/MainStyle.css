@@ -21,7 +21,6 @@ body {
   display: inline-block;
   cursor: pointer;
   color: #ffffff;
-  font-family: Arial;
   font-size: 14px;
   padding: 13px 100px;
   text-decoration: none;
@@ -99,8 +98,6 @@ textarea {
 }
 
 .list-wrapper {
-  position: relative;
-  left: 100px;
   max-width: 350px;
   margin: 50px auto;
   background: white;

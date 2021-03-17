@@ -1,4 +1,6 @@
-import './App.css';
+//import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Container, Row, Col, Navbar, Nav, Form, Button, FormControl } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import { BoardComponent } from './Board';
@@ -6,6 +8,7 @@ import { Login } from './UserLogin';
 import { UserListContainer } from './PlayerList';
 import { ShowWhenGameEnds } from './GameOverEvent';
 import { LeaderBoard } from './LeaderBoard';
+import { NavBar } from './NavBar';
 
 const socket = io();
 
@@ -68,17 +71,41 @@ function App() {
       }
       setLeaderBoard(() => jsFriendlyArray);
     });
+    const client_id = socket.io.engine.id;
     // Handle logout for when the user closes tab/refreshes page
     window.addEventListener('beforeunload', () => {
-      socket.emit('logout', { id: socket.io.engine.id });
+      socket.emit('logout', { id: client_id });
     });
     // Handle logout for any other instance where the object is dismounted
     return function cleanup() {
       // remove from playerlist
-      socket.emit('logout', { id: socket.io.engine.id });
+      socket.emit('logout', { id: client_id });
     };
   }, []);
-
+  
+    return (
+      <Container>
+        <Row>
+            <Col sm={12}>
+                <NavBar toggleGame={() => console.log('wow')} toggleLeaderboard={() => console.log('oh my')}/>
+            </Col>
+        </Row>
+        <Row>
+            <Col md={6}>
+            </Col>
+        </Row>
+        <Row>
+            <Col>
+                <BoardComponent socket={socket} users={userList.slice(0,2)} />
+            </Col>
+            <Col>
+                <UserListContainer userList={userList} />
+            </Col>
+        </Row>
+      </Container>
+    );
+  
+/*
   return (
     <div className="App">
       {!loggedIn ? (
@@ -99,7 +126,7 @@ function App() {
         />
       ) : null}
     </div>
-  );
+  ); */
 }
 
 export default App;
