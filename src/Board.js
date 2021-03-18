@@ -3,9 +3,8 @@ import React, { useState, useEffect } from 'react';
 // import io from 'socket.io-client';
 import './Board.css';
 
-export function BoardComponent(props) {
-  const [board, setBoard] = useState(['', '', '', '', '', '', '', '', '']);
-  const { socket } = props;
+function BoardComponent(props) {
+  const { socket, board, setBoard, users } = props;
 
   function updateArray(arr, index, value) {
     return arr.map((val, i) => {
@@ -80,8 +79,8 @@ export function BoardComponent(props) {
       } else {
         socket.emit('game_over', {
           state: 'win',
-          winner: props.users[playerNumber][1],
-          loser: playerNumber === 0 ? props.users[1][1] : props.users[0][1],
+          winner: users[playerNumber][1],
+          loser: playerNumber === 0 ? users[1][1] : users[0][1],
         });
       }
     }
@@ -89,7 +88,7 @@ export function BoardComponent(props) {
   }
 
   function onClickBoard(index) {
-    const playerNumber = inArray(props.users, socket.io.engine.id);
+    const playerNumber = inArray(users, socket.io.engine.id);
     if (playerNumber >= 0) {
       // Stop spectators from moving
       // stop illegal moves
@@ -137,3 +136,5 @@ export function Square(props) {
     </div>
   );
 }
+
+export default BoardComponent;

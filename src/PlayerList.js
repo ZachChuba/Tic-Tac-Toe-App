@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
 import Badge from 'react-bootstrap/Badge';
 
-export function UserListContainer(props) {
+function UserListContainer(props) {
   const { userList } = props;
   return (
     <Accordion defaultActiveKey='0'>
@@ -51,9 +51,7 @@ function PlayerList(props) {
   const { activePlayers } = props;
   return (
     <ListGroup>
-      <PlayerListItem player='test' idx={0}/>
-      <PlayerListItem player='tester' idx={1}/>
-      {activePlayers.map((player, idx) => <PlayerListItem player={player} idx={idx} />)}
+      {activePlayers.map((player, idx) => <PlayerListItem player={player[1]} idx={idx} />)}
     </ListGroup>
   );
 }
@@ -73,9 +71,7 @@ function SpectatorList(props) {
   const { spectatorList } = props;
   return (
     <ListGroup>
-      <SpectatorListItem user='zach' />
-      <SpectatorListItem user='rand' />
-      {spectatorList.map((user) => <SpectatorListItem user={user} />)}
+      {spectatorList.map((user) => <SpectatorListItem user={user[1]} />)}
     </ListGroup>
   );
 }

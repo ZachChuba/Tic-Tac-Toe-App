@@ -1,14 +1,12 @@
 import React from 'react';
-import './MainStyle.css';
+import Table from 'react-bootstrap/Table';
 
-export function LeaderBoard(props) {
-  const { toggleLeaderboard, showLeaderBoard, leaderBoard } = props;
+function LeaderBoard(props) {
+  const { leaderboard } = props;
+  console.log(leaderboard);
   return (
     <div>
-      <DisplayLeaderBoardButton toggleLeaderboard={toggleLeaderboard} />
-      {showLeaderBoard && (
-        <LeaderBoardTable leaderBoard={leaderBoard} />
-      )}
+      <LeaderBoardTable leaderBoard={leaderboard} />
     </div>
   );
 }
@@ -17,9 +15,10 @@ function LeaderBoardTable(props) {
   const { leaderBoard } = props;
   return (
     <div>
-      <table className="blueTable">
+      <Table variant="light" className="mt-5" striped bordered hover>
         <thead>
           <tr>
+            <th>Rank</th>
             {' '}
             <th>Player Name</th>
             {' '}
@@ -27,34 +26,23 @@ function LeaderBoardTable(props) {
             {' '}
           </tr>
         </thead>
-        <tfoot>Only the top 50 are displayed</tfoot>
         <tbody>
-          {leaderBoard.map((entry) => (
-            <LeaderBoardRow name={entry[0]} score={entry[1]} />
-          ))}
+          {leaderBoard.map((entry) => <LeaderBoardRow rank={entry[2]} name={entry[0]} score={entry[1]} />)}
         </tbody>
-      </table>
+      </Table>
     </div>
   );
 }
 
 function LeaderBoardRow(props) {
-  const { name, score } = props;
+  const { name, score, rank } = props;
   return (
     <tr>
+      <td>{rank}</td>
       <td>{name}</td>
       <td>{score}</td>
     </tr>
   );
 }
 
-function DisplayLeaderBoardButton(props) {
-  const { toggleLeaderboard } = props;
-  return (
-    <div>
-      <button type="button" className="myButton" id="lb" onClick={toggleLeaderboard}>
-        Toggle Leaderboard
-      </button>
-    </div>
-  );
-}
+export default LeaderBoard;

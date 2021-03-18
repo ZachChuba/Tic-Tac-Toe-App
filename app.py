@@ -69,7 +69,7 @@ def on_disconnect(data):
     transmit that new playerlist out
     '''
     global CURRENT_PLAYER_LIST
-    print('Logout')
+    print('Logout ' + str(data))
     SOCKETIO.emit('logout', data, broadcast=True, include_self=False)
     CURRENT_PLAYER_LIST = list(
         filter(lambda entry: entry['uid'] != data['id'], CURRENT_PLAYER_LIST))
@@ -97,6 +97,18 @@ def on_get_leaderboard():
                   json.dumps(entries),
                   room=get_request_sid())
 
+
+@SOCKETIO.on('get_player_from_leaderboard')
+def on_search_player(data):
+    print('Received player request for: ' + data['name'])
+    player_entry = Player.query.filter_by(username=data['name']).first()
+    
+    if player_entry is None:
+        SOCKETIO.emit('leaderboard_player_entry', json.dumps({ 'exists': 'false' }), room=get_request_sid())
+    else:
+        player_rank = get_player_rank(data['name'])
+        json_packet = { 'exists': 'true', 'rank': player_rank, 'name': player_entry.username, 'score': player_entry.score }
+        SOCKETIO.emit('leaderboard_player_entry', json.dumps(json_packet), room=get_request_sid())
 
 LAST_UPDATE_TIME = time.time()
 
@@ -193,6 +205,17 @@ def get_leaderboard_data():
             'name': user.username,
             'score': user.score
         }, top_50_users))
+        
+
+def get_player_rank(username):
+    '''
+    Given string username, return the rank of the player
+    '''
+    players_list = Player.query.order_by(Player.score.desc()).all()
+    for player, index in enumerate(players_list):
+        if player.username == username:
+            return index + 1
+    return -1
 
 
 # END DB functions

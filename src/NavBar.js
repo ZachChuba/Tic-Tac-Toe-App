@@ -5,28 +5,29 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl';
 
-export function NavBar(props) {
-    const { toggleGame, toggleLeaderboard } = props;
+function NavBar(props) {
+    const { toggleGame, toggleLeaderboard, requestEntry } = props;
     return (
         <Navbar bg='light' expand='lg'>
             <Navbar.Brand>Tic Tac Toe</Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id='basic-navbar-nav'>
-                <Nav className='mr-auto' onSelect={(selectedItem) => selectedItem === "game" ? toggleGame : toggleLeaderboard}>
+                <Nav className='mr-auto' onSelect={(selectedItem) => selectedItem === "game" ? toggleGame() : toggleLeaderboard()}>
                     <Nav.Link eventKey="game">Game</Nav.Link>
                     <Nav.Link eventKey="leaderboard">Leaderboard</Nav.Link>
                 </Nav>
-                <Search />
+                <SearchElement requestEntry={requestEntry} />
             </Navbar.Collapse>
         </Navbar>
     );
 }
 
-function Search(props) {
+function SearchElement(props) {
+    const { requestEntry } = props;
     return (
         <Form inline>
             <FormControl type="text" placeholder="Find Leaderboard Rating" className="mr-sm-2" />
-            <Button variant="outline-success">Search</Button>
+            <Button onClick={requestEntry} variant="outline-success">Search</Button>
        </Form>
     );
 }

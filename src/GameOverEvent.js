@@ -3,7 +3,7 @@ import Jumbotron from 'react-bootstrap/Jumbotron';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert'
 
-export function GameEndedMessage(props) {
+function GameEndedMessage(props) {
   const { result, resetGame } = props;
   return (
     <Alert className='mt-5' key={0} variant='info'>
@@ -17,7 +17,7 @@ export function GameEndedMessage(props) {
   );
 }
 
-export function ShowWhenGameEnds(props) {
+function ShowWhenGameEnds(props) {
   const { result, resetGame } = props;
   return (
     <div>
