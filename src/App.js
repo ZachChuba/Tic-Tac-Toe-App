@@ -1,14 +1,13 @@
-//import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Row, Col, Navbar, Nav, Form, Button, FormControl } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
-import { BoardComponent } from './Board';
-import { Login } from './UserLogin';
-import { UserListContainer } from './PlayerList';
-import { ShowWhenGameEnds, GameEndedMessage } from './GameOverEvent';
-import { LeaderBoard } from './LeaderBoard';
-import { NavBar } from './NavBar';
+import BoardComponent from './Board';
+import Login from './UserLogin';
+import UserListContainer from './PlayerList';
+import GameEndedMessage from './GameOverEvent';
+import LeaderBoard from './LeaderBoard';
+import NavBar from './NavBar';
 
 const socket = io();
 
@@ -16,6 +15,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [userList, setUserList] = useState([]);
   const [win, setWin] = useState(null);
+  const [board, setBoard] = useState(['','','','','','','','','']);
   const [showLeaderBoard, setShowLeaderBoard] = useState(false);
   const [leaderBoard, setLeaderBoard] = useState([]);
 
@@ -45,6 +45,9 @@ function App() {
       if (!showLeaderBoard) {
           setShowLeaderBoard(true);
       }
+  }
+  function requestLeaderboardEntry(username) {
+      socket.emit('get_player_from_leaderboard', {name: username} );
   }
 
   useEffect(() => {
@@ -77,49 +80,51 @@ function App() {
       const dataJson = JSON.parse(data);
       const jsFriendlyArray = [];
       for (let i = 0; i < dataJson.length; i += 1) {
-        jsFriendlyArray.push([dataJson[i].name, dataJson[i].score]);
+        jsFriendlyArray.push([dataJson[i].name, dataJson[i].score, i+1]);
       }
       setLeaderBoard(() => jsFriendlyArray);
     });
-    const client_id = socket.io.engine.id;
+    socket.on('leaderboard_player_entry', (data) => {
+        if (data.exists === 'true') {
+            setLeaderBoard(() => [data.name, data.score, data.rank])
+            clickedLeader();
+        } else {
+            
+        }
+    });
     // Handle logout for when the user closes tab/refreshes page
     window.addEventListener('beforeunload', () => {
-      socket.emit('logout', { id: client_id });
+      socket.emit('logout', { id: socket.io.engine.id });
     });
-    // Handle logout for any other instance where the object is dismounted
-    return function cleanup() {
-      // remove from playerlist
-      socket.emit('logout', { id: client_id });
-    };
   }, []);
   
     return (
         <div>
-          { true && <div>
+          { !loggedIn && <div>
             <Login socket={socket} statusFunction={setLoggedIn} />
           </div>
           }
-          { false && <div>
-            <NavBar toggleGame={clickedGame} toggleLeaderboard={clickedLeader}/>
+          { loggedIn && <div>
+            <NavBar toggleGame={clickedGame} toggleLeaderboard={clickedLeader} requestEntry={requestLeaderboardEntry} />
             <Container>
-              { true &&
+              { leaderBoard &&
               <Row>
                   <Col sm={12}>
-                      
+                      <LeaderBoard leaderboard={leaderBoard} />
                   </Col>
               </Row>
               }
-              { win !== null && loggedIn &&
+              { win !== null && !leaderBoard &&
               <Row>
                   <Col className='ml-5' md={4}>
-                      <GameEndedMessage result={'x'} resetGame={resetGameButton} />
+                      <GameEndedMessage result={win} resetGame={resetGameButton} />
                   </Col>
               </Row>
               }
-              { true &&
+              { !leaderBoard &&
               <Row>
                   <Col>
-                      <BoardComponent socket={socket} users={userList.slice(0,2)} />
+                      <BoardComponent socket={socket} users={userList.slice(0,2)} board={board} setBoard={setBoard} />
                   </Col>
                   <Col>
                       <UserListContainer userList={userList} />
