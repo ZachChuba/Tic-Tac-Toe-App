@@ -212,7 +212,7 @@ def get_player_rank(username):
     Given string username, return the rank of the player
     '''
     players_list = Player.query.order_by(Player.score.desc()).all()
-    for player, index in enumerate(players_list):
+    for index, player in enumerate(players_list):
         if player.username == username:
             return index + 1
     return -1

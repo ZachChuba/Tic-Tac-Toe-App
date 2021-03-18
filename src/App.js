@@ -18,6 +18,7 @@ function App() {
   const [board, setBoard] = useState(['','','','','','','','','']);
   const [showLeaderBoard, setShowLeaderBoard] = useState(false);
   const [leaderBoard, setLeaderBoard] = useState([]);
+  let currPane = 0; // 0: game 1: leaderBoard 2: filteredLeaderBoard
 
   function removeFromArray(arr, id) {
     return arr.filter((val) => val[0] !== id);
@@ -39,11 +40,14 @@ function App() {
   function clickedGame() {
       if (showLeaderBoard) {
         setShowLeaderBoard(false);
+        currPane = 0;
       }
   }
   function clickedLeader() {
-      if (!showLeaderBoard) {
+      if (currPane !== 1 ) {
           setShowLeaderBoard(true);
+          socket.emit('get_leaderboard');
+          currPane = 1;
       }
   }
   function requestLeaderboardEntry(username) {
@@ -85,9 +89,13 @@ function App() {
       setLeaderBoard(() => jsFriendlyArray);
     });
     socket.on('leaderboard_player_entry', (data) => {
-        if (data.exists === 'true') {
-            setLeaderBoard(() => [data.name, data.score, data.rank])
-            clickedLeader();
+        const dataJson = JSON.parse(data);
+        if (dataJson.exists === 'true') {
+            currPane = 2;
+            if (!showLeaderBoard) {
+                setShowLeaderBoard(true);
+            }
+            setLeaderBoard([[dataJson.name, dataJson.score, dataJson.rank]])
         } else {
             
         }
@@ -107,21 +115,21 @@ function App() {
           { loggedIn && <div>
             <NavBar toggleGame={clickedGame} toggleLeaderboard={clickedLeader} requestEntry={requestLeaderboardEntry} />
             <Container>
-              { leaderBoard &&
+              { showLeaderBoard &&
               <Row>
                   <Col sm={12}>
                       <LeaderBoard leaderboard={leaderBoard} />
                   </Col>
               </Row>
               }
-              { win !== null && !leaderBoard &&
+              { win !== null && !showLeaderBoard &&
               <Row>
                   <Col className='ml-5' md={4}>
                       <GameEndedMessage result={win} resetGame={resetGameButton} />
                   </Col>
               </Row>
               }
-              { !leaderBoard &&
+              { !showLeaderBoard &&
               <Row>
                   <Col>
                       <BoardComponent socket={socket} users={userList.slice(0,2)} board={board} setBoard={setBoard} />

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Form from 'react-bootstrap/Form';
@@ -24,10 +24,11 @@ function NavBar(props) {
 
 function SearchElement(props) {
     const { requestEntry } = props;
+    const formText = useRef(null);
     return (
         <Form inline>
-            <FormControl type="text" placeholder="Find Leaderboard Rating" className="mr-sm-2" />
-            <Button onClick={requestEntry} variant="outline-success">Search</Button>
+            <FormControl type="text" placeholder="Find Leaderboard Rating" className="mr-sm-2" ref={formText} />
+            <Button onClick={() => requestEntry(formText.current.value)} variant="outline-success">Search</Button>
        </Form>
     );
 }
