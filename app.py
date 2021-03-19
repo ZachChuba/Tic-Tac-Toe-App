@@ -104,7 +104,7 @@ def on_search_player(data):
     player_entry = Player.query.filter_by(username=data['name']).first()
     
     if player_entry is None:
-        SOCKETIO.emit('leaderboard_player_entry', json.dumps({ 'exists': 'false' }), room=get_request_sid())
+        SOCKETIO.emit('leaderboard_player_entry', json.dumps({ 'exists': 'false', 'name': data['name'] }), room=get_request_sid())
     else:
         player_rank = get_player_rank(data['name'])
         json_packet = { 'exists': 'true', 'rank': player_rank, 'name': player_entry.username, 'score': player_entry.score }

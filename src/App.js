@@ -8,6 +8,7 @@ import UserListContainer from './PlayerList';
 import GameEndedMessage from './GameOverEvent';
 import LeaderBoard from './LeaderBoard';
 import NavBar from './NavBar';
+import PopUpBubble from './InvalidSearch';
 
 const socket = io();
 
@@ -18,6 +19,9 @@ function App() {
   const [board, setBoard] = useState(['','','','','','','','','']);
   const [showLeaderBoard, setShowLeaderBoard] = useState(false);
   const [leaderBoard, setLeaderBoard] = useState([]);
+  const [showBubble, setShowBubble] = useState(false);
+  const [searchName, setSearchName] = useState(null);
+  
   let currPane = 0; // 0: game 1: leaderBoard 2: filteredLeaderBoard
 
   function removeFromArray(arr, id) {
@@ -97,7 +101,8 @@ function App() {
             }
             setLeaderBoard([[dataJson.name, dataJson.score, dataJson.rank]])
         } else {
-            
+            setShowBubble(true);
+            setSearchName(dataJson.name);
         }
     });
     // Handle logout for when the user closes tab/refreshes page
@@ -114,6 +119,7 @@ function App() {
           }
           { loggedIn && <div>
             <NavBar toggleGame={clickedGame} toggleLeaderboard={clickedLeader} requestEntry={requestLeaderboardEntry} />
+            {showBubble && <PopUpBubble showBubble={showBubble} setShowBubble={setShowBubble} searchName={searchName} />}
             <Container>
               { showLeaderBoard &&
               <Row>
