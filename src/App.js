@@ -144,35 +144,6 @@ function App() {
           }
       </div>
     );
-  /*
-  <Row>
-            <Col md={6}>
-                <ShowWhenGameEnds result={'x'} resetGame={resetGameButton}/>
-            </Col>
-        </Row>
-  */
-/*
-  return (
-    <div className="App">
-      {!loggedIn ? (
-        <Login statusFunction={setLoggedIn} socket={socket} />
-      ) : null}
-      {win != null && loggedIn ? (
-        <ShowWhenGameEnds result={win} resetGame={resetGameButton} />
-      ) : null}
-      {loggedIn ? (
-        <BoardComponent socket={socket} users={userList.slice(0, 2)} />
-      ) : null}
-      {loggedIn ? <UserListContainer userList={userList} /> : null}
-      {loggedIn ? (
-        <LeaderBoard
-          leaderBoard={leaderBoard}
-          toggleLeaderboard={toggleLeaderBoard}
-          showLeaderBoard={showLeaderBoard}
-        />
-      ) : null}
-    </div>
-  ); */
 }
 
 export default App;
