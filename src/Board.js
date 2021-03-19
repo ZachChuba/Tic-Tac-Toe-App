@@ -16,8 +16,6 @@ function BoardComponent(props) {
   }
 
   function inArray(arr, target) {
-    console.log(target);
-    console.log(arr[0][0]);
     for (let i = 0; i < arr.length; i += 1) {
       if (arr[i][0].localeCompare(target) === 0) {
         return i;
@@ -91,7 +89,6 @@ function BoardComponent(props) {
 
   function onClickBoard(index) {
     const playerNumber = inArray(users, socket.io.engine.id);
-    console.log(playerNumber);
     if (playerNumber >= 0) {
       // Stop spectators from moving
       // stop illegal moves
