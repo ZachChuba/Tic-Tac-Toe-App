@@ -17,7 +17,7 @@ Clone/download the repository then do the following:
 
 # Known Bugs
 1. Occasionally, upon winning a game the leaderboard will count the game twice. Although this usually doesn't happen, I can't fully fix it without tampering with the react modules files.
-3. CSS alignment. Although the game looks fine on my 17" screen, the format gets ugly when the screen size changes. I don't have enough experience with css or time to make it more robust, but what the game's supposed to look like is available [here](https://imgur.com/a/6rxlQCn)
+3. Because I'm relying on javascripts `beforeunload` event to update the userlist, it sometimes doesn't work--particularly on heroku.
 
 # Problems I Experienced and How I Handled Them
 1. Whenever the game ended, the client would send two gameover events to the server, which in turn would update the database twice (making each win/loss +/-2). I investigated and discovered that because my gameover event was transmitted inside a setState function, React strict mode would run that function twice. I could not disable react strict mode, so I instead patched it by keeping track of the current time when I update my database. If the times are too close, then the database will not update the second time.
