@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import './Board.css';
 
 function BoardComponent(props) {
-  const { socket, board, setBoard, users } = props;
+  const { socket, board, setBoard, users, userId } = props;
 
   function updateArray(arr, index, value) {
     return arr.map((val, i) => {
@@ -88,7 +88,7 @@ function BoardComponent(props) {
   }
 
   function onClickBoard(index) {
-    const playerNumber = inArray(users, socket.io.engine.id);
+    const playerNumber = inArray(users, userId);
     if (playerNumber >= 0) {
       // Stop spectators from moving
       // stop illegal moves

@@ -11,7 +11,7 @@ function Login(props) {
   function loginPressed(text) {
     // if user has entered a name join and display
     statusFunction(true);
-    socket.emit('login', { id: socket.io.engine.id, name: text });
+    socket.emit('login', { name: text });
   }
   
   const cardStyle = {

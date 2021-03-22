@@ -11,6 +11,7 @@ import NavBar from './NavBar';
 import PopUpBubble from './InvalidSearch';
 
 const socket = io();
+let userId = null;
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -59,14 +60,19 @@ function App() {
   }
 
   useEffect(() => {
-    socket.on('login', (data) => {
+    socket.on('player_list_update', (data) => {
       // add to playerlist
       // Event 1: The user is not logging in for the first time
-      if ({}.hasOwnProperty.call(data, 'id')) {
-        setUserList((prevList) => [...prevList, [data.id, data.name]]);
-      } else {
+      const dataJson = JSON.parse(data);
+      if ({}.hasOwnProperty.call(dataJson, 'uid')) {
+        setUserList((prevList) => [...prevList, [dataJson.uid, dataJson.name]]);
+      } else if ({}.hasOwnProperty.call(dataJson, 'players')) {
         // Event 2: The user logs in for the first time, needs list from server
-        const dataJson = JSON.parse(data);
+        let usersGiven = dataJson.players;
+        userId = dataJson.own_id;
+        setUserList(() => usersGiven.map((entry) => [entry.uid, entry.name]));
+      } else {
+        // Event 3: User list updated by disconnect event
         setUserList(() => dataJson.map((entry) => [entry.uid, entry.name]));
       }
     });
@@ -105,10 +111,6 @@ function App() {
             setSearchName(dataJson.name);
         }
     });
-    // Handle logout for when the user closes tab/refreshes page
-    window.addEventListener('beforeunload', () => {
-      socket.emit('logout', { id: socket.io.engine.id });
-    });
   }, []);
   
     return (
@@ -138,7 +140,7 @@ function App() {
               { !showLeaderBoard &&
               <Row>
                   <Col>
-                      <BoardComponent socket={socket} users={userList.slice(0,2)} board={board} setBoard={setBoard} />
+                      <BoardComponent socket={socket} userId={userId} users={userList.slice(0,2)} board={board} setBoard={setBoard} />
                   </Col>
                   <Col>
                       <UserListContainer userList={userList} />

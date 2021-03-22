@@ -45,6 +45,23 @@ def index(filename):
     return send_from_directory('./build', filename)
 
 
+@SOCKETIO.on('disconnect')
+# When a client disconnects from this Socket connection, this function is run
+def on_player_leaves():
+    '''
+    After a player disconnects, remove them from the list
+    Then transmit the new userlist to all clients
+    '''
+    global CURRENT_PLAYER_LIST
+    print('Player with ID {} has disconnected'.format(request.sid))
+    
+    before_filter_len = len(CURRENT_PLAYER_LIST)
+    CURRENT_PLAYER_LIST = list(filter(lambda player_entry: player_entry['uid'] != request.sid, CURRENT_PLAYER_LIST))
+    
+    if before_filter_len != len(CURRENT_PLAYER_LIST):
+        SOCKETIO.emit('player_list_update', json.dumps(CURRENT_PLAYER_LIST), broadcast=True, include_self=False)
+
+
 # When a client clicks the login button, this function is run
 @SOCKETIO.on('login')
 def on_connect(data):
@@ -53,26 +70,16 @@ def on_connect(data):
     send playerlist to everyone, add to leaderboard
     '''
     print('Login')
-    CURRENT_PLAYER_LIST.append({'uid': data['id'], 'name': data['name']})
+    new_user_data = {'uid': request.sid, 'name': data['name']}
+    CURRENT_PLAYER_LIST.append(new_user_data)
     ensure_new_user_on_leaderboard(data['name'])
 
-    SOCKETIO.emit('login', data, broadcast=True, include_self=False)
-    SOCKETIO.emit('login', json.dumps(CURRENT_PLAYER_LIST), room=request.sid)
+    # Send only the new user to current connections
+    SOCKETIO.emit('player_list_update', json.dumps(new_user_data), broadcast=True, include_self=False)
+    # Send all users to the new connection
+    SOCKETIO.emit('player_list_update', json.dumps({'players': CURRENT_PLAYER_LIST, 'own_id': request.sid}), room=request.sid)
+    # Send the board to the new connection
     SOCKETIO.emit('board_state', json.dumps(BOARD), room=request.sid)
-
-
-# When a client disconnects from this Socket connection, this function is run
-@SOCKETIO.on('logout')
-def on_disconnect(data):
-    '''
-    On the logout socketio event, remove the user that left from player list
-    transmit that new playerlist out
-    '''
-    global CURRENT_PLAYER_LIST
-    print('Logout ' + str(data))
-    SOCKETIO.emit('logout', data, broadcast=True, include_self=False)
-    CURRENT_PLAYER_LIST = list(
-        filter(lambda entry: entry['uid'] != data['id'], CURRENT_PLAYER_LIST))
 
 
 @SOCKETIO.on('board_click')
